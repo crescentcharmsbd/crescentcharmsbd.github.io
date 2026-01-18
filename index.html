@@ -2,9 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crescent Charms BD - Business Manager</title>
-    <link rel="icon" type="image/png" href="Crescent_Charms.png">
     <style>
         * {
             margin: 0;
@@ -309,6 +308,46 @@
                     <input type="tel" id="orderPhone" placeholder="+880 1XXX-XXXXXX">
                 </div>
                 <div class="form-group">
+                    <label>Delivery Address *</label>
+                    <input type="text" id="orderAddress" placeholder="Enter full delivery address">
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 30px; color: #0f3460;">📦 Products in Order</h3>
+            <div id="productsList" style="margin-bottom: 20px;">
+                <!-- Products will be added here -->
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Select Product</label>
+                    <select id="orderProduct">
+                        <option value="">Select a product</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Quantity</label>
+                    <input type="number" id="orderQuantity" placeholder="1" value="1" min="1">
+                </div>
+            </div>
+            <button class="btn" style="background: #0f3460; color: white; margin-bottom: 20px;" onclick="addProductToOrder()">➕ Add Product to Order</button>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Total Cost (BDT)</label>
+                    <input type="number" id="orderCost" placeholder="Auto-calculated" readonly style="background: #f5f5f5;">
+                </div>
+                <div class="form-group">
+                    <label>Gross Amount (BDT) *</label>
+                    <input type="number" id="orderGross" placeholder="What customer paid" oninput="calculateOrderProfit()">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Profit (BDT)</label>
+                    <input type="number" id="orderProfit" placeholder="Auto-calculated" readonly style="background: #f5f5f5;">
+                </div>
+                <div class="form-group">
                     <label>Status *</label>
                     <select id="orderStatus">
                         <option value="pending">Pending</option>
@@ -317,11 +356,7 @@
                     </select>
                 </div>
             </div>
-            <div class="form-group">
-                <label>Delivery Address *</label>
-                <input type="text" id="orderAddress" placeholder="Enter full delivery address">
-            </div>
-            <button class="btn btn-primary" onclick="addOrder()">➕ Add Order</button>
+            <button class="btn btn-primary" onclick="addOrder()">✅ Create Order</button>
             
             <div class="search-box" style="margin-top: 40px;">
                 <input type="text" id="searchOrders" placeholder="🔍 Search by tracking number, name, or phone..." onkeyup="searchOrders()">
@@ -333,8 +368,10 @@
                         <th>Tracking #</th>
                         <th>Customer</th>
                         <th>Phone</th>
-                        <th>Email</th>
-                        <th>Address</th>
+                        <th>Products</th>
+                        <th>Cost (৳)</th>
+                        <th>Gross (৳)</th>
+                        <th>Profit (৳)</th>
                         <th>Date</th>
                         <th>Status</th>
                         <th>Actions</th>
@@ -351,17 +388,17 @@
         const API_KEY = 'AIzaSyDsB7LyUHBbsF--oTUI_b6KeGM2xGCVIAc';
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7YHt9WnuTgtGlNBHob36Q9ud-SZE2tVQi9at2M3mAznEDjXYoRwknmJ2JmRsORjcj/exec';
 
-
         
         // PASSWORD PROTECTION
         const ORDER_TRACKING_PASSWORD = 'Crescent@@4545T';
-        const INVENTORY_PASSWORD = 'Crescent@@4545T';
+        const INVENTORY_PASSWORD = 'Crescent@@4545T'; 
         let isOrderTrackingUnlocked = false;
         let isInventoryUnlocked = false;
         
         let inventory = [];
         let orders = [];
         let trackingCounter = 1;
+        let currentOrderProducts = []; // Temporary storage for products being added to current order
         
         // Load data from Google Sheets on page load
         window.addEventListener('load', () => {
@@ -410,8 +447,13 @@
                         email: row[3] || '',
                         phone: row[4] || '',
                         address: row[5] || '',
-                        status: row[6] || 'pending',
-                        date: row[7] || new Date().toLocaleDateString()
+                        productSummary: row[6] || '',
+                        cost: parseFloat(row[7]) || 0,
+                        gross: parseFloat(row[8]) || 0,
+                        profit: parseFloat(row[9]) || 0,
+                        status: row[10] || 'pending',
+                        date: row[11] || new Date().toLocaleDateString(),
+                        products: row[12] ? JSON.parse(row[12]) : []
                     }));
                     renderOrders();
                 }
@@ -543,6 +585,7 @@
             
             if (inventory.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>No items in inventory</h3><p>Add your first item to get started!</p></td></tr>';
+                updateProductDropdown();
                 return;
             }
             
@@ -562,6 +605,116 @@
                     </td>
                 </tr>
             `).join('');
+            
+            updateProductDropdown();
+        }
+        
+        function updateProductDropdown() {
+            const select = document.getElementById('orderProduct');
+            select.innerHTML = '<option value="">Select a product</option>';
+            
+            inventory.forEach(item => {
+                const option = document.createElement('option');
+                option.value = JSON.stringify({id: item.id, name: item.name, price: item.price});
+                option.textContent = `${item.name} - ৳${item.price.toFixed(2)}`;
+                select.appendChild(option);
+            });
+        }
+        
+        function calculateProfit() {
+            const productSelect = document.getElementById('orderProduct');
+            const grossInput = document.getElementById('orderGross');
+            const profitInput = document.getElementById('orderProfit');
+            
+            if (productSelect.value && grossInput.value) {
+                const product = JSON.parse(productSelect.value);
+                const gross = parseFloat(grossInput.value);
+                const profit = gross - product.price;
+                profitInput.value = profit.toFixed(2);
+            } else {
+                profitInput.value = '';
+            }
+        }
+        
+        function addProductToOrder() {
+            const productSelect = document.getElementById('orderProduct');
+            const quantityInput = document.getElementById('orderQuantity');
+            
+            if (!productSelect.value) {
+                alert('Please select a product!');
+                return;
+            }
+            
+            const product = JSON.parse(productSelect.value);
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            currentOrderProducts.push({
+                id: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: quantity,
+                total: product.price * quantity
+            });
+            
+            renderOrderProducts();
+            calculateOrderTotals();
+            
+            // Reset selection
+            productSelect.value = '';
+            quantityInput.value = '1';
+        }
+        
+        function removeProductFromOrder(index) {
+            currentOrderProducts.splice(index, 1);
+            renderOrderProducts();
+            calculateOrderTotals();
+        }
+        
+        function renderOrderProducts() {
+            const container = document.getElementById('productsList');
+            
+            if (currentOrderProducts.length === 0) {
+                container.innerHTML = '<p style="color: #999; font-style: italic;">No products added yet. Add products above.</p>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
+                    ${currentOrderProducts.map((item, index) => `
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; margin-bottom: 10px; border-radius: 6px;">
+                            <div>
+                                <strong>${item.name}</strong> × ${item.quantity}
+                                <span style="color: #666; margin-left: 10px;">৳${item.price.toFixed(2)} each</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <strong style="color: #0f3460;">৳${item.total.toFixed(2)}</strong>
+                                <button onclick="removeProductFromOrder(${index})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+        
+        function calculateOrderTotals() {
+            const totalCost = currentOrderProducts.reduce((sum, item) => sum + item.total, 0);
+            document.getElementById('orderCost').value = totalCost.toFixed(2);
+            calculateOrderProfit();
+        }
+        
+        function calculateOrderProfit() {
+            const costInput = document.getElementById('orderCost');
+            const grossInput = document.getElementById('orderGross');
+            const profitInput = document.getElementById('orderProfit');
+            
+            if (costInput.value && grossInput.value) {
+                const cost = parseFloat(costInput.value);
+                const gross = parseFloat(grossInput.value);
+                const profit = gross - cost;
+                profitInput.value = profit.toFixed(2);
+            } else {
+                profitInput.value = '';
+            }
         }
         
         function addOrder() {
@@ -570,13 +723,19 @@
             const phone = document.getElementById('orderPhone').value.trim();
             const address = document.getElementById('orderAddress').value.trim();
             const status = document.getElementById('orderStatus').value;
+            const cost = document.getElementById('orderCost').value.trim();
+            const gross = document.getElementById('orderGross').value.trim();
+            const profit = document.getElementById('orderProfit').value.trim();
             
-            if (!name || !phone || !address) {
-                alert('Please fill in customer name, phone, and address!');
+            if (!name || !phone || !address || currentOrderProducts.length === 0 || !gross) {
+                alert('Please fill in customer name, phone, address, add at least one product, and enter gross amount!');
                 return;
             }
             
             const tracking = `CC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+            
+            // Create product summary string
+            const productSummary = currentOrderProducts.map(p => `${p.name} (${p.quantity}x)`).join(', ');
             
             const order = {
                 id: Date.now(),
@@ -585,6 +744,11 @@
                 email,
                 phone,
                 address,
+                products: [...currentOrderProducts], // Store full product details
+                productSummary: productSummary,
+                cost: parseFloat(cost),
+                gross: parseFloat(gross),
+                profit: parseFloat(profit),
                 status,
                 date: new Date().toLocaleDateString()
             };
@@ -593,11 +757,20 @@
             renderOrders();
             saveToGoogleSheets();
             
+            // Clear form
             document.getElementById('orderName').value = '';
             document.getElementById('orderEmail').value = '';
             document.getElementById('orderPhone').value = '';
             document.getElementById('orderAddress').value = '';
             document.getElementById('orderStatus').value = 'pending';
+            document.getElementById('orderProduct').value = '';
+            document.getElementById('orderQuantity').value = '1';
+            document.getElementById('orderCost').value = '';
+            document.getElementById('orderGross').value = '';
+            document.getElementById('orderProfit').value = '';
+            
+            currentOrderProducts = [];
+            renderOrderProducts();
             
             alert(`Order created! Tracking number: ${tracking}`);
         }
@@ -623,7 +796,7 @@
             const tbody = document.getElementById('ordersBody');
             
             if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><h3>No orders yet</h3><p>Add your first order to start tracking!</p></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><h3>No orders yet</h3><p>Add your first order to start tracking!</p></td></tr>';
                 return;
             }
             
@@ -632,8 +805,10 @@
                     <td><strong>${order.tracking}</strong></td>
                     <td>${order.name}</td>
                     <td>${order.phone}</td>
-                    <td>${order.email || '-'}</td>
-                    <td>${order.address}</td>
+                    <td><span style="font-size: 13px;">${order.productSummary || order.product || '-'}</span></td>
+                    <td>৳${order.cost ? order.cost.toFixed(2) : (order.productPrice ? order.productPrice.toFixed(2) : '0.00')}</td>
+                    <td>৳${order.gross ? order.gross.toFixed(2) : '0.00'}</td>
+                    <td style="color: ${order.profit >= 0 ? '#155724' : '#721c24'}; font-weight: bold;">৳${order.profit ? order.profit.toFixed(2) : '0.00'}</td>
                     <td><span style="color: #666; font-size: 14px;">${order.date}</span></td>
                     <td>
                         <select class="status-badge status-${order.status}" onchange="updateOrderStatus(${order.id}, this.value)" style="border: none; font-weight: bold; cursor: pointer;">
@@ -685,12 +860,14 @@
             const filtered = orders.filter(order => 
                 order.tracking.toLowerCase().includes(search) ||
                 order.name.toLowerCase().includes(search) ||
-                order.phone.includes(search)
+                order.phone.includes(search) ||
+                (order.productSummary && order.productSummary.toLowerCase().includes(search)) ||
+                (order.product && order.product.toLowerCase().includes(search))
             );
             
             const tbody = document.getElementById('ordersBody');
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><h3>No results found</h3></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><h3>No results found</h3></td></tr>';
                 return;
             }
             
@@ -699,8 +876,10 @@
                     <td><strong>${order.tracking}</strong></td>
                     <td>${order.name}</td>
                     <td>${order.phone}</td>
-                    <td>${order.email || '-'}</td>
-                    <td>${order.address}</td>
+                    <td><span style="font-size: 13px;">${order.productSummary || order.product || '-'}</span></td>
+                    <td>৳${order.cost ? order.cost.toFixed(2) : (order.productPrice ? order.productPrice.toFixed(2) : '0.00')}</td>
+                    <td>৳${order.gross ? order.gross.toFixed(2) : '0.00'}</td>
+                    <td style="color: ${order.profit >= 0 ? '#155724' : '#721c24'}; font-weight: bold;">৳${order.profit ? order.profit.toFixed(2) : '0.00'}</td>
                     <td><span style="color: #666; font-size: 14px;">${order.date}</span></td>
                     <td>
                         <select class="status-badge status-${order.status}" onchange="updateOrderStatus(${order.id}, this.value)" style="border: none; font-weight: bold; cursor: pointer;">
@@ -721,4 +900,3 @@
     </script>
 </body>
 </html>
-
