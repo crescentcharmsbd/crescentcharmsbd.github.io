@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Crescent Charms BD - Business Manager</title>
+    <link rel="icon" type="image/png" href="Crescent_Charms.png">
     <style>
         * {
             margin: 0;
@@ -234,7 +235,6 @@
         }
     </style>
 </head>
-  <link rel="icon" type="image/png" href="Crescent_Charms.png">
 <body>
     <div class="container">
         <div class="header">
@@ -248,7 +248,7 @@
         </div>
         
         <!-- Inventory Section -->
-        <div id="inventory" class="section active">
+        <div id="inventory" class="section">
             <h2>Inventory Management</h2>
             <div class="form-row" style="margin-top: 30px;">
                 <div class="form-group">
@@ -353,12 +353,23 @@
 
 
         
+        // PASSWORD PROTECTION
+        const ORDER_TRACKING_PASSWORD = 'crescent2026';
+        const INVENTORY_PASSWORD = 'crescent2026';
+        let isOrderTrackingUnlocked = false;
+        let isInventoryUnlocked = false;
+        
         let inventory = [];
         let orders = [];
         let trackingCounter = 1;
         
         // Load data from Google Sheets on page load
         window.addEventListener('load', () => {
+            // Hide both sections initially - require password first
+            document.getElementById('inventory').classList.remove('active');
+            document.getElementById('orders').classList.remove('active');
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
             if (SHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE' && API_KEY !== 'YOUR_API_KEY_HERE') {
                 loadFromGoogleSheets();
             } else {
@@ -453,6 +464,36 @@
         }
         
         function showSection(section) {
+            // Check password for inventory
+            if (section === 'inventory' && !isInventoryUnlocked) {
+                const password = prompt('🔒 Enter password to access Inventory:');
+                
+                if (password === INVENTORY_PASSWORD) {
+                    isInventoryUnlocked = true;
+                    alert('✅ Access granted!');
+                } else if (password !== null) {
+                    alert('❌ Incorrect password!');
+                    return;
+                } else {
+                    return; // User cancelled
+                }
+            }
+            
+            // Check password for order tracking
+            if (section === 'orders' && !isOrderTrackingUnlocked) {
+                const password = prompt('🔒 Enter password to access Order Tracking:');
+                
+                if (password === ORDER_TRACKING_PASSWORD) {
+                    isOrderTrackingUnlocked = true;
+                    alert('✅ Access granted!');
+                } else if (password !== null) {
+                    alert('❌ Incorrect password!');
+                    return;
+                } else {
+                    return; // User cancelled
+                }
+            }
+            
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             
