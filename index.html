@@ -1,212 +1,681 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Crescent Charms ✨</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  <style>
-    /* Reset & Base */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Poppins', sans-serif; background: #f8f6fc; color: #222; }
-    a { text-decoration: none; color: inherit; }
-    img { max-width: 100%; display: block; }
-
-    /* Navbar */
-    header {
-      position: sticky; top: 0; background: #fff; z-index: 1000;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05); 
-    }
-    nav { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; }
-    nav .logo { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; color: #6d5bff; }
-    nav ul { list-style: none; display: flex; gap: 1.5rem; }
-    nav ul li { font-weight: 600; }
-    nav ul li a:hover { color: #6d5bff; transition: 0.3s; }
-
-    /* Hero Section */
-    .hero {
-      height: 90vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(to bottom, #f2ecff 0%, #fff 100%);
-      text-align: center;
-      position: relative;
-    }
-    .hero h1 { font-family: 'Playfair Display', serif; font-size: 3rem; color: #6d5bff; margin-bottom: 1rem; }
-    .hero p { font-size: 1.2rem; margin-bottom: 2rem; color: #555; }
-    .hero .btn {
-      background: #6d5bff; color: #fff; padding: 0.8rem 2rem; border-radius: 25px;
-      font-weight: 600; transition: 0.3s;
-    }
-    .hero .btn:hover { background: #5740d2; }
-
-    /* Collections Section */
-    .collections {
-      padding: 4rem 2rem;
-      text-align: center;
-    }
-    .collections h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: #6d5bff; margin-bottom: 2rem; }
-    .collection-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-    }
-    .collection-card {
-      background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
-    }
-    .collection-card:hover { transform: translateY(-5px); }
-    .collection-card img { width: 100%; height: 300px; object-fit: cover; }
-    .collection-card h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin: 1rem; color: #333; }
-
-    /* Products Section */
-    .products {
-      padding: 4rem 2rem;
-      background: #f0efff;
-      text-align: center;
-    }
-    .products h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: #6d5bff; margin-bottom: 2rem; }
-    .product-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 2rem;
-    }
-    .product-card {
-      background: #fff; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: 0.3s;
-      cursor: pointer;
-    }
-    .product-card:hover { transform: translateY(-5px); }
-    .product-card img { width: 100%; height: 250px; object-fit: cover; }
-    .product-card h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 0.5rem 1rem; color: #333; }
-    .product-card p { margin: 0 1rem 1rem; font-weight: 600; color: #6d5bff; }
-
-    /* About Section */
-    .about {
-      padding: 4rem 2rem;
-      text-align: center;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    .about h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: #6d5bff; margin-bottom: 1rem; }
-    .about p { font-size: 1.1rem; color: #555; line-height: 1.8; }
-
-    /* Contact Section */
-    .contact {
-      padding: 4rem 2rem;
-      text-align: center;
-    }
-    .contact h2 { font-family: 'Playfair Display', serif; font-size: 2rem; color: #6d5bff; margin-bottom: 2rem; }
-    .contact form { max-width: 500px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem; }
-    .contact input, .contact textarea {
-      padding: 0.8rem; border-radius: 10px; border: 1px solid #ccc; font-size: 1rem; resize: none;
-    }
-    .contact button {
-      padding: 0.8rem; border-radius: 25px; border: none; background: #6d5bff; color: #fff; font-weight: 600;
-      cursor: pointer; transition: 0.3s;
-    }
-    .contact button:hover { background: #5740d2; }
-
-    /* Footer */
-    footer {
-      padding: 2rem; text-align: center; background: #fff; color: #555;
-      border-top: 1px solid #eee;
-    }
-    footer a { color: #6d5bff; }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .hero h1 { font-size: 2.2rem; }
-      .hero p { font-size: 1rem; }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crescent Charms BD - Business Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #e94560 0%, #0f3460 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        
+        .nav-btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .nav-btn.active {
+            background: #e94560;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+        
+        .nav-btn:not(.active) {
+            background: white;
+            color: #e94560;
+            border: 2px solid #e94560;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .section {
+            display: none;
+            padding: 30px;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #e94560;
+        }
+        
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            margin-right: 10px;
+        }
+        
+        .btn-primary {
+            background: #e94560;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #d63651;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+        
+        .search-box {
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: #0f3460;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: bold;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            display: inline-block;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-delivered {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-canceled {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 6px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-buttons {
+                flex-direction: column;
+            }
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+        
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
 <body>
-
-  <!-- Navbar -->
-  <header>
-    <nav>
-      <div class="logo">Crescent Charms ✨</div>
-      <ul>
-        <li><a href="#collections">Collections</a></li>
-        <li><a href="#products">Shop</a></li>
-        <li><a href="#about">About</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-    </nav>
-  </header>
-
-  <!-- Hero -->
-  <section class="hero">
-    <h1>Crescent Charms ✨</h1>
-    <p>Moonlit Magic in Every Charm</p>
-    <a href="#collections" class="btn">Shop Now</a>
-  </section>
-
-  <!-- Collections -->
-  <section class="collections" id="collections">
-    <h2>Our Collections</h2>
-    <div class="collection-grid">
-      <div class="collection-card">
-        <img src="https://images.unsplash.com/photo-1600185361739-bca4de521d23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8amV3ZWxyeXxlbnwwfHx8fDE2OTc0NjU1ODQ&ixlib=rb-4.0.3&q=80&w=400" alt="Necklaces">
-        <h3>Necklaces</h3>
-      </div>
-      <div class="collection-card">
-        <img src="https://images.unsplash.com/photo-1571801991235-77177690f041?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8cmlnc3xlbnwwfHx8fDE2OTc0NjU2NTg&ixlib=rb-4.0.3&q=80&w=400" alt="Rings">
-        <h3>Rings</h3>
-      </div>
-      <div class="collection-card">
-        <img src="https://images.unsplash.com/photo-1609854003140-4f4e8f07fa46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8YnJhY2VsZXRzfGVufDB8fHx8MTY5NzQ2NTY5NA&ixlib=rb-4.0.3&q=80&w=400" alt="Bracelets">
-        <h3>Bracelets</h3>
-      </div>
+    <div class="container">
+        <div class="header">
+            <h1>🌙 Crescent Charms BD</h1>
+            <p>Business Management System</p>
+        </div>
+        
+        <div class="nav-buttons">
+            <button class="nav-btn active" onclick="showSection('inventory')">📦 Inventory Manager</button>
+            <button class="nav-btn" onclick="showSection('orders')">📋 Order Tracking</button>
+        </div>
+        
+        <!-- Inventory Section -->
+        <div id="inventory" class="section active">
+            <h2>Inventory Management</h2>
+            <div class="form-row" style="margin-top: 30px;">
+                <div class="form-group">
+                    <label>Item Name *</label>
+                    <input type="text" id="itemName" placeholder="Enter item name">
+                </div>
+                <div class="form-group">
+                    <label>Price (BDT) *</label>
+                    <input type="number" id="itemPrice" placeholder="Enter price">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Product Link</label>
+                    <input type="url" id="itemLink" placeholder="https://example.com/product">
+                </div>
+                <div class="form-group">
+                    <label>Photo URL</label>
+                    <input type="url" id="itemPhoto" placeholder="https://example.com/image.jpg">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="addItem()">➕ Add Item</button>
+            
+            <div class="search-box" style="margin-top: 40px;">
+                <input type="text" id="searchInventory" placeholder="🔍 Search inventory..." onkeyup="searchInventory()">
+            </div>
+            
+            <table id="inventoryTable">
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Price (BDT)</th>
+                        <th>Link</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryBody"></tbody>
+            </table>
+        </div>
+        
+        <!-- Orders Section -->
+        <div id="orders" class="section">
+            <h2>Order Tracking</h2>
+            <div class="form-row" style="margin-top: 30px;">
+                <div class="form-group">
+                    <label>Customer Name *</label>
+                    <input type="text" id="orderName" placeholder="Enter customer name">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="orderEmail" placeholder="customer@example.com">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone Number *</label>
+                    <input type="tel" id="orderPhone" placeholder="+880 1XXX-XXXXXX">
+                </div>
+                <div class="form-group">
+                    <label>Status *</label>
+                    <select id="orderStatus">
+                        <option value="pending">Pending</option>
+                        <option value="delivered">Delivered</option>
+                        <option value="canceled">Canceled</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Delivery Address *</label>
+                <input type="text" id="orderAddress" placeholder="Enter full delivery address">
+            </div>
+            <button class="btn btn-primary" onclick="addOrder()">➕ Add Order</button>
+            
+            <div class="search-box" style="margin-top: 40px;">
+                <input type="text" id="searchOrders" placeholder="🔍 Search by tracking number, name, or phone..." onkeyup="searchOrders()">
+            </div>
+            
+            <table id="ordersTable">
+                <thead>
+                    <tr>
+                        <th>Tracking #</th>
+                        <th>Customer</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Address</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="ordersBody"></tbody>
+            </table>
+        </div>
     </div>
-  </section>
+    
+    <script>
+        // GOOGLE SHEETS CONFIGURATION
+        const SHEET_ID = '1jU07VA_IKBi50rg_mHahr0rUxfUYpure8JCYY9jBYx0';
+        const API_KEY = 'AIzaSyDsB7LyUHBbsF--oTUI_b6KeGM2xGCVIAc';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7YHt9WnuTgtGlNBHob36Q9ud-SZE2tVQi9at2M3mAznEDjXYoRwknmJ2JmRsORjcj/exec';
 
-  <!-- Products -->
-  <section class="products" id="products">
-    <h2>Featured Products</h2>
-    <div class="product-grid">
-      <div class="product-card">
-        <img src="https://images.unsplash.com/photo-1600185361739-bca4de521d23?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8amVlc3xlbnwwfHx8fDE2OTc0NjU3NjQ&ixlib=rb-4.0.3&q=80&w=400" alt="Product 1">
-        <h3>Moonlight Necklace</h3>
-        <p>$49</p>
-      </div>
-      <div class="product-card">
-        <img src="https://images.unsplash.com/photo-1571801991235-77177690f041?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8cmlnfGVufDB8fHx8MTY5NzQ2NTc5OA&ixlib=rb-4.0.3&q=80&w=400" alt="Product 2">
-        <h3>Lunar Ring</h3>
-        <p>$35</p>
-      </div>
-      <div class="product-card">
-        <img src="https://images.unsplash.com/photo-1609854003140-4f4e8f07fa46?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxfDB8MXxyYW5kb218MHx8YnJhY2VsZXN8ZW58MHx8fHwxNjk3NDY1ODE4&ixlib=rb-4.0.3&q=80&w=400" alt="Product 3">
-        <h3>Starry Bracelet</h3>
-        <p>$29</p>
-      </div>
-    </div>
-  </section>
 
-  <!-- About -->
-  <section class="about" id="about">
-    <h2>About Crescent Charms</h2>
-    <p>
-      Crescent Charms ✨ is inspired by the beauty and magic of the moon. Each charm is crafted to bring a little sparkle, elegance, and magic into your everyday life. Our collections are carefully curated to combine timeless design with dreamy, celestial inspiration.
-    </p>
-  </section>
-
-  <!-- Contact -->
-  <section class="contact" id="contact">
-    <h2>Contact Us</h2>
-    <form>
-      <input type="text" placeholder="Your Name" required>
-      <input type="email" placeholder="Your Email" required>
-      <textarea rows="5" placeholder="Your Message" required></textarea>
-      <button type="submit">Send Message</button>
-    </form>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    &copy; 2026 Crescent Charms. All rights reserved. | <a href="https://www.instagram.com/crescentcharms">Instagram</a>
-  </footer>
-
+        
+        let inventory = [];
+        let orders = [];
+        let trackingCounter = 1;
+        
+        // Load data from Google Sheets on page load
+        window.addEventListener('load', () => {
+            if (SHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE' && API_KEY !== 'YOUR_API_KEY_HERE') {
+                loadFromGoogleSheets();
+            } else {
+                console.log('⚠️ Google Sheets not configured. Using local storage only.');
+            }
+        });
+        
+        async function loadFromGoogleSheets() {
+            try {
+                // Load Inventory
+                const inventoryResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Inventory?key=${API_KEY}`
+                );
+                const inventoryData = await inventoryResponse.json();
+                
+                if (inventoryData.values && inventoryData.values.length > 1) {
+                    inventory = inventoryData.values.slice(1).map(row => ({
+                        id: parseInt(row[0]) || Date.now(),
+                        name: row[1] || '',
+                        price: parseFloat(row[2]) || 0,
+                        link: row[3] || '',
+                        photo: row[4] || ''
+                    }));
+                    renderInventory();
+                }
+                
+                // Load Orders
+                const ordersResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Orders?key=${API_KEY}`
+                );
+                const ordersData = await ordersResponse.json();
+                
+                if (ordersData.values && ordersData.values.length > 1) {
+                    orders = ordersData.values.slice(1).map(row => ({
+                        id: parseInt(row[0]) || Date.now(),
+                        tracking: row[1] || '',
+                        name: row[2] || '',
+                        email: row[3] || '',
+                        phone: row[4] || '',
+                        address: row[5] || '',
+                        status: row[6] || 'pending',
+                        date: row[7] || new Date().toLocaleDateString()
+                    }));
+                    renderOrders();
+                }
+                
+                console.log('✅ Data loaded from Google Sheets successfully!');
+            } catch (error) {
+                console.error('❌ Error loading from Google Sheets:', error);
+                alert('Could not load data from Google Sheets. Check your API key and Sheet ID.');
+            }
+        }
+        
+        async function saveToGoogleSheets() {
+            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+                console.log('⚠️ Apps Script not configured. Data saved locally only.');
+                return;
+            }
+            
+            try {
+                // Save Inventory
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sheet: 'Inventory',
+                        items: inventory
+                    })
+                });
+                
+                // Save Orders
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        sheet: 'Orders',
+                        orders: orders
+                    })
+                });
+                
+                console.log('✅ Data saved to Google Sheets successfully!');
+            } catch (error) {
+                console.error('❌ Error saving to Google Sheets:', error);
+                alert('Could not save to Google Sheets. Data is saved locally.');
+            }
+        }
+        
+        function showSection(section) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById(section).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function addItem() {
+            const name = document.getElementById('itemName').value.trim();
+            const price = document.getElementById('itemPrice').value.trim();
+            const link = document.getElementById('itemLink').value.trim();
+            const photo = document.getElementById('itemPhoto').value.trim();
+            
+            if (!name || !price) {
+                alert('Please fill in item name and price!');
+                return;
+            }
+            
+            const item = {
+                id: Date.now(),
+                name,
+                price: parseFloat(price),
+                link,
+                photo
+            };
+            
+            inventory.push(item);
+            renderInventory();
+            saveToGoogleSheets();
+            
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemLink').value = '';
+            document.getElementById('itemPhoto').value = '';
+        }
+        
+        function removeItem(id) {
+            if (confirm('Are you sure you want to remove this item?')) {
+                inventory = inventory.filter(item => item.id !== id);
+                renderInventory();
+                saveToGoogleSheets();
+            }
+        }
+        
+        function renderInventory() {
+            const tbody = document.getElementById('inventoryBody');
+            
+            if (inventory.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>No items in inventory</h3><p>Add your first item to get started!</p></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = inventory.map(item => `
+                <tr>
+                    <td>
+                        ${item.photo ? 
+                            `<img src="${item.photo}" class="item-image" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                             <div style="display:none; color:#999; font-size:12px;">No Image</div>` 
+                            : '<span style="color: #999;">No image</span>'}
+                    </td>
+                    <td><strong>${item.name}</strong></td>
+                    <td>৳${item.price.toFixed(2)}</td>
+                    <td>${item.link ? `<a href="${item.link}" target="_blank" style="color: #e94560;">🔗 View</a>` : '-'}</td>
+                    <td>
+                        <button class="btn btn-danger action-btn" onclick="removeItem(${item.id})">Remove</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function addOrder() {
+            const name = document.getElementById('orderName').value.trim();
+            const email = document.getElementById('orderEmail').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const address = document.getElementById('orderAddress').value.trim();
+            const status = document.getElementById('orderStatus').value;
+            
+            if (!name || !phone || !address) {
+                alert('Please fill in customer name, phone, and address!');
+                return;
+            }
+            
+            const tracking = `CC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
+            
+            const order = {
+                id: Date.now(),
+                tracking,
+                name,
+                email,
+                phone,
+                address,
+                status,
+                date: new Date().toLocaleDateString()
+            };
+            
+            orders.push(order);
+            renderOrders();
+            saveToGoogleSheets();
+            
+            document.getElementById('orderName').value = '';
+            document.getElementById('orderEmail').value = '';
+            document.getElementById('orderPhone').value = '';
+            document.getElementById('orderAddress').value = '';
+            document.getElementById('orderStatus').value = 'pending';
+            
+            alert(`Order created! Tracking number: ${tracking}`);
+        }
+        
+        function updateOrderStatus(id, newStatus) {
+            const order = orders.find(o => o.id === id);
+            if (order) {
+                order.status = newStatus;
+                renderOrders();
+                saveToGoogleSheets();
+            }
+        }
+        
+        function removeOrder(id) {
+            if (confirm('Are you sure you want to remove this order?')) {
+                orders = orders.filter(order => order.id !== id);
+                renderOrders();
+                saveToGoogleSheets();
+            }
+        }
+        
+        function renderOrders() {
+            const tbody = document.getElementById('ordersBody');
+            
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><h3>No orders yet</h3><p>Add your first order to start tracking!</p></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = orders.map(order => `
+                <tr>
+                    <td><strong>${order.tracking}</strong></td>
+                    <td>${order.name}</td>
+                    <td>${order.phone}</td>
+                    <td>${order.email || '-'}</td>
+                    <td>${order.address}</td>
+                    <td><span style="color: #666; font-size: 14px;">${order.date}</span></td>
+                    <td>
+                        <select class="status-badge status-${order.status}" onchange="updateOrderStatus(${order.id}, this.value)" style="border: none; font-weight: bold; cursor: pointer;">
+                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
+                            <option value="canceled" ${order.status === 'canceled' ? 'selected' : ''}>❌ Canceled</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger action-btn" onclick="removeOrder(${order.id})">Remove</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function searchInventory() {
+            const search = document.getElementById('searchInventory').value.toLowerCase();
+            const filtered = inventory.filter(item => 
+                item.name.toLowerCase().includes(search) ||
+                item.price.toString().includes(search)
+            );
+            
+            const tbody = document.getElementById('inventoryBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>No results found</h3></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(item => `
+                <tr>
+                    <td>
+                        ${item.photo ? 
+                            `<img src="${item.photo}" class="item-image" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                             <div style="display:none; color:#999; font-size:12px;">No Image</div>` 
+                            : '<span style="color: #999;">No image</span>'}
+                    </td>
+                    <td><strong>${item.name}</strong></td>
+                    <td>৳${item.price.toFixed(2)}</td>
+                    <td>${item.link ? `<a href="${item.link}" target="_blank" style="color: #e94560;">🔗 View</a>` : '-'}</td>
+                    <td>
+                        <button class="btn btn-danger action-btn" onclick="removeItem(${item.id})">Remove</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function searchOrders() {
+            const search = document.getElementById('searchOrders').value.toLowerCase();
+            const filtered = orders.filter(order => 
+                order.tracking.toLowerCase().includes(search) ||
+                order.name.toLowerCase().includes(search) ||
+                order.phone.includes(search)
+            );
+            
+            const tbody = document.getElementById('ordersBody');
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state"><h3>No results found</h3></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(order => `
+                <tr>
+                    <td><strong>${order.tracking}</strong></td>
+                    <td>${order.name}</td>
+                    <td>${order.phone}</td>
+                    <td>${order.email || '-'}</td>
+                    <td>${order.address}</td>
+                    <td><span style="color: #666; font-size: 14px;">${order.date}</span></td>
+                    <td>
+                        <select class="status-badge status-${order.status}" onchange="updateOrderStatus(${order.id}, this.value)" style="border: none; font-weight: bold; cursor: pointer;">
+                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
+                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
+                            <option value="canceled" ${order.status === 'canceled' ? 'selected' : ''}>❌ Canceled</option>
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-danger action-btn" onclick="removeOrder(${order.id})">Remove</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        renderInventory();
+        renderOrders();
+    </script>
 </body>
 </html>
