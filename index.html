@@ -46,6 +46,7 @@
             gap: 20px;
             padding: 20px;
             background: #f5f5f5;
+            flex-wrap: wrap;
         }
         
         .nav-btn {
@@ -96,7 +97,7 @@
             color: #333;
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid #ddd;
@@ -105,7 +106,7 @@
             transition: border 0.3s;
         }
         
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: #e94560;
         }
@@ -119,6 +120,7 @@
             font-weight: bold;
             transition: all 0.3s;
             margin-right: 10px;
+            margin-bottom: 10px;
         }
         
         .btn-primary {
@@ -136,12 +138,14 @@
             color: white;
         }
         
-        .btn-danger:hover {
-            background: #c0392b;
+        .btn-success {
+            background: #27ae60;
+            color: white;
         }
         
-        .search-box {
-            margin-bottom: 20px;
+        .btn-info {
+            background: #0f3460;
+            color: white;
         }
         
         table {
@@ -199,6 +203,7 @@
             height: 60px;
             object-fit: cover;
             border-radius: 6px;
+            background: #f0f0f0;
         }
         
         .form-row {
@@ -229,9 +234,91 @@
             color: #999;
         }
         
-        .empty-state h3 {
-            font-size: 24px;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: white;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 800px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .modal-close:hover {
+            color: #000;
+        }
+        
+        .invoice {
+            background: white;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .invoice-header {
+            border-bottom: 3px solid #e94560;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .product-list-item {
+            background: #f5f5f5;
+            padding: 10px;
             margin-bottom: 10px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-badge {
+            background: #e94560;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .profit-positive {
+            color: #155724;
+            font-weight: bold;
+        }
+        
+        .profit-negative {
+            color: #721c24;
+            font-weight: bold;
+        }
+        
+        @media print {
+            body {
+                background: white;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .invoice {
+                box-shadow: none;
+            }
         }
     </style>
 </head>
@@ -242,17 +329,16 @@
             <p>Business Management System</p>
         </div>
         
-        <div class="nav-buttons">
-            <button class="nav-btn active" onclick="showSection('inventory')">📦 Inventory Manager</button>
-            <button class="nav-btn" onclick="showSection('orders')">📋 Order Tracking</button>
+        <div class="nav-buttons no-print">
+            <button class="nav-btn" onclick="showSection('inventory')">📦 Inventory</button>
+            <button class="nav-btn" onclick="showSection('orders')">📋 Orders</button>
+            <button class="nav-btn" onclick="showSection('customers')">👥 Customers</button>
+            <button class="nav-btn" onclick="showSection('invoices')">🧾 Invoices</button>
         </div>
         
         <!-- Inventory Section -->
         <div id="inventory" class="section">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2>Inventory Management</h2>
-                <button class="btn btn-danger" onclick="cleanDuplicates()" style="font-size: 14px;">🧹 Clean Duplicates</button>
-            </div>
+            <h2>Inventory Management</h2>
             <div class="form-row" style="margin-top: 30px;">
                 <div class="form-group">
                     <label>Item Name *</label>
@@ -275,40 +361,29 @@
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Price (BDT) *</label>
-                    <input type="number" id="itemPrice" placeholder="Enter price">
+                    <label>Cost Price (BDT) *</label>
+                    <input type="number" id="itemCost" placeholder="What you paid">
                 </div>
+                <div class="form-group">
+                    <label>Selling Price (BDT) *</label>
+                    <input type="number" id="itemPrice" placeholder="What you sell for">
+                </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group">
                     <label>Product Link</label>
                     <input type="url" id="itemLink" placeholder="https://example.com/product">
                 </div>
+                <div class="form-group">
+                    <label>Photo URL (Direct image link)</label>
+                    <input type="url" id="itemPhoto" placeholder="https://i.imgur.com/image.jpg">
+                </div>
             </div>
-            <div class="form-group">
-                <label>Photo URL</label>
-                <input type="url" id="itemPhoto" placeholder="https://example.com/image.jpg">
-            </div>
-            <button class="btn btn-primary" onclick="addItem()">➕ Add Item</button>
+            <button class="btn btn-primary" onclick="saveItem()">➕ Add Item</button>
+            <button class="btn" onclick="cancelEditItem()" id="cancelItemBtn" style="display: none; background: #999; color: white;">✖ Cancel</button>
             
-            <div style="margin-top: 40px; display: flex; gap: 15px; align-items: center;">
-                <div class="search-box" style="flex: 1; margin: 0;">
-                    <input type="text" id="searchInventory" placeholder="🔍 Search inventory..." onkeyup="searchInventory()">
-                </div>
-                <div style="min-width: 200px;">
-                    <select id="categoryFilter" onchange="filterByCategory()" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
-                        <option value="all">All Categories</option>
-                        <option value="Bracelets">Bracelets</option>
-                        <option value="Necklaces">Necklaces</option>
-                        <option value="Earrings">Earrings</option>
-                        <option value="Rings">Rings</option>
-                        <option value="Anklets">Anklets</option>
-                        <option value="Charms">Charms</option>
-                        <option value="Sets">Sets</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <button class="btn" onclick="toggleSort()" style="background: #0f3460; color: white; white-space: nowrap;">
-                    <span id="sortIcon">📊</span> Sort A-Z
-                </button>
+            <div style="margin-top: 40px;">
+                <input type="text" id="searchInventory" placeholder="🔍 Search inventory..." onkeyup="renderInventory()" style="width: 100%;">
             </div>
             
             <table id="inventoryTable">
@@ -317,8 +392,9 @@
                         <th>Photo</th>
                         <th>Category</th>
                         <th>Name</th>
-                        <th>Price (BDT)</th>
-                        <th>Link</th>
+                        <th>Cost</th>
+                        <th>Selling Price</th>
+                        <th>Margin</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -328,64 +404,69 @@
         
         <!-- Orders Section -->
         <div id="orders" class="section">
-            <h2>Order Tracking</h2>
+            <h2>Order Management</h2>
             <div class="form-row" style="margin-top: 30px;">
+                <div class="form-group">
+                    <label>Customer *</label>
+                    <select id="orderCustomer" onchange="loadCustomerData()">
+                        <option value="">Select or add new customer</option>
+                    </select>
+                </div>
                 <div class="form-group">
                     <label>Customer Name *</label>
                     <input type="text" id="orderName" placeholder="Enter customer name">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone *</label>
+                    <input type="tel" id="orderPhone" placeholder="+880 1XXX-XXXXXX">
                 </div>
                 <div class="form-group">
                     <label>Email</label>
                     <input type="email" id="orderEmail" placeholder="customer@example.com">
                 </div>
             </div>
-            <div class="form-row">
-                <div class="form-group">
-                    <label>Phone Number *</label>
-                    <input type="tel" id="orderPhone" placeholder="+880 1XXX-XXXXXX">
-                </div>
-                <div class="form-group">
-                    <label>Delivery Address *</label>
-                    <input type="text" id="orderAddress" placeholder="Enter full delivery address">
-                </div>
+            <div class="form-group">
+                <label>Address *</label>
+                <textarea id="orderAddress" rows="2" placeholder="Delivery address"></textarea>
+            </div>
+            <div class="form-group">
+                <label>Customer Notes</label>
+                <textarea id="orderNotes" rows="2" placeholder="Special requests, preferences, etc."></textarea>
             </div>
             
-            <h3 style="margin-top: 30px; color: #0f3460;">📦 Products in Order</h3>
-            <div id="productsList" style="margin-bottom: 20px;">
-                <!-- Products will be added here -->
-            </div>
-            
+            <h3 style="margin-top: 30px;">Products</h3>
+            <div id="orderProductsList"></div>
             <div class="form-row">
                 <div class="form-group">
                     <label>Select Product</label>
-                    <select id="orderProduct">
-                        <option value="">Select a product</option>
-                    </select>
+                    <select id="orderProduct"></select>
                 </div>
                 <div class="form-group">
                     <label>Quantity</label>
-                    <input type="number" id="orderQuantity" placeholder="1" value="1" min="1">
+                    <input type="number" id="orderQuantity" value="1" min="1">
                 </div>
             </div>
-            <button class="btn" style="background: #0f3460; color: white; margin-bottom: 20px;" onclick="addProductToOrder()">➕ Add Product to Order</button>
+            <button class="btn btn-info" onclick="addProductToOrder()">➕ Add Product</button>
             
-            <div class="form-row">
+            <div class="form-row" style="margin-top: 20px;">
                 <div class="form-group">
-                    <label>Total Cost (BDT)</label>
-                    <input type="number" id="orderCost" placeholder="Auto-calculated" readonly style="background: #f5f5f5;">
+                    <label>Total Cost (Auto)</label>
+                    <input type="number" id="orderCost" readonly style="background: #f5f5f5;">
                 </div>
                 <div class="form-group">
-                    <label>Gross Amount (BDT) *</label>
-                    <input type="number" id="orderGross" placeholder="What customer paid" oninput="calculateOrderProfit()">
+                    <label>Gross Amount *</label>
+                    <input type="number" id="orderGross" placeholder="What customer paid" oninput="calcOrderProfit()">
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
-                    <label>Profit (BDT)</label>
-                    <input type="number" id="orderProfit" placeholder="Auto-calculated" readonly style="background: #f5f5f5;">
+                    <label>Profit (Auto)</label>
+                    <input type="number" id="orderProfit" readonly style="background: #f5f5f5;">
                 </div>
                 <div class="form-group">
-                    <label>Status *</label>
+                    <label>Status</label>
                     <select id="orderStatus">
                         <option value="pending">Pending</option>
                         <option value="delivered">Delivered</option>
@@ -393,139 +474,637 @@
                     </select>
                 </div>
             </div>
-            <button class="btn btn-primary" onclick="addOrder()">✅ Create Order</button>
             
-            <div class="search-box" style="margin-top: 40px;">
-                <input type="text" id="searchOrders" placeholder="🔍 Search by tracking number, name, or phone..." onkeyup="searchOrders()">
+            <button class="btn btn-primary" onclick="saveOrder()">✅ Create Order</button>
+            <button class="btn" onclick="cancelEditOrder()" id="cancelOrderBtn" style="display: none; background: #999; color: white;">✖ Cancel</button>
+            
+            <div style="margin-top: 40px;">
+                <input type="text" id="searchOrders" placeholder="🔍 Search orders..." onkeyup="renderOrders()" style="width: 100%;">
             </div>
             
-            <table id="ordersTable">
+            <table>
                 <thead>
                     <tr>
-                        <th>Tracking #</th>
+                        <th>Tracking</th>
                         <th>Customer</th>
-                        <th>Phone</th>
                         <th>Products</th>
-                        <th>Cost (৳)</th>
-                        <th>Gross (৳)</th>
-                        <th>Profit (৳)</th>
-                        <th>Date</th>
+                        <th>Gross</th>
+                        <th>Profit</th>
                         <th>Status</th>
+                        <th>Date</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="ordersBody"></tbody>
             </table>
         </div>
+        
+        <!-- Customers Section -->
+        <div id="customers" class="section">
+            <h2>Customer Database</h2>
+            <div style="margin-top: 20px;">
+                <input type="text" id="searchCustomers" placeholder="🔍 Search customers..." onkeyup="renderCustomers()" style="width: 100%;">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                        <th>Total Orders</th>
+                        <th>Total Spent</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customersBody"></tbody>
+            </table>
+        </div>
+        
+        <!-- Invoices Section -->
+        <div id="invoices" class="section">
+            <h2>Generate Invoice</h2>
+            <div class="form-group" style="margin-top: 20px;">
+                <label>Enter Tracking Number</label>
+                <input type="text" id="invoiceTracking" placeholder="CC-XXXXX">
+            </div>
+            <button class="btn btn-primary" onclick="generateInvoice()">📄 Generate Invoice</button>
+            
+            <div id="invoicePreview" style="margin-top: 30px;"></div>
+        </div>
+    </div>
+    
+    <!-- Invoice Modal -->
+    <div id="invoiceModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close no-print" onclick="closeInvoice()">&times;</span>
+            <div id="invoiceContent"></div>
+            <div class="no-print" style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-primary" onclick="window.print()">🖨️ Print Invoice</button>
+            </div>
+        </div>
     </div>
     
     <script>
-        // GOOGLE SHEETS CONFIGURATION
+        // Configuration
         const SHEET_ID = '1jU07VA_IKBi50rg_mHahr0rUxfUYpure8JCYY9jBYx0';
         const API_KEY = 'AIzaSyDsB7LyUHBbsF--oTUI_b6KeGM2xGCVIAc';
         const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7YHt9WnuTgtGlNBHob36Q9ud-SZE2tVQi9at2M3mAznEDjXYoRwknmJ2JmRsORjcj/exec';
-
-        
-        // PASSWORD PROTECTION
-        const ORDER_TRACKING_PASSWORD = 'Crescent@@4545T';
-        const INVENTORY_PASSWORD = 'Crescent@@4545T'; 
-        let isOrderTrackingUnlocked = false;
-        let isInventoryUnlocked = false;
+        const PASSWORD = 'Crescent@@4545T';
         
         let inventory = [];
         let orders = [];
-        let trackingCounter = 1;
-        let currentOrderProducts = []; // Temporary storage for products being added to current order
-        let sortAscending = true;
-        let currentCategory = 'all';
+        let customers = [];
+        let currentOrderProducts = [];
+        let isUnlocked = false;
+        let editingItemId = null;
+        let editingOrderId = null;
         
-        // Load data from Google Sheets on page load
-        window.addEventListener('load', () => {
-            // Hide both sections initially - require password first
-            document.getElementById('inventory').classList.remove('active');
-            document.getElementById('orders').classList.remove('active');
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            if (SHEET_ID !== 'YOUR_SPREADSHEET_ID_HERE' && API_KEY !== 'YOUR_API_KEY_HERE') {
-                loadFromGoogleSheets();
-            } else {
-                console.log('⚠️ Google Sheets not configured. Using local storage only.');
+        // Show section
+        function showSection(section) {
+            if (!isUnlocked) {
+                const pwd = prompt('🔒 Enter password:');
+                if (pwd !== PASSWORD) {
+                    alert('❌ Incorrect password!');
+                    return;
+                }
+                isUnlocked = true;
             }
-        });
+            
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(section).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (section === 'inventory') renderInventory();
+            if (section === 'orders') {
+                renderOrders();
+                updateCustomerDropdown();
+                updateProductDropdown();
+            }
+            if (section === 'customers') renderCustomers();
+        }
         
-        async function loadFromGoogleSheets() {
-            try {
-                // Load Inventory
-                const inventoryResponse = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Inventory?key=${API_KEY}`
-                );
-                const inventoryData = await inventoryResponse.json();
-                
-                if (inventoryData.values && inventoryData.values.length > 1) {
-                    // Clear existing inventory to prevent duplicates
-                    inventory = [];
-                    
-                    inventoryData.values.slice(1).forEach(row => {
-                        // Only add if not already in inventory (check by ID)
-                        const id = parseInt(row[0]) || Date.now();
-                        if (!inventory.find(item => item.id === id)) {
-                            inventory.push({
-                                id: id,
-                                name: row[1] || '',
-                                category: row[2] || 'Other',
-                                price: parseFloat(row[3]) || 0,
-                                link: row[4] || '',
-                                photo: row[5] || ''
-                            });
-                        }
-                    });
-                    renderInventory();
+        // INVENTORY FUNCTIONS
+        function saveItem() {
+            const name = document.getElementById('itemName').value.trim();
+            const category = document.getElementById('itemCategory').value;
+            const cost = parseFloat(document.getElementById('itemCost').value);
+            const price = parseFloat(document.getElementById('itemPrice').value);
+            const link = document.getElementById('itemLink').value.trim();
+            const photo = document.getElementById('itemPhoto').value.trim();
+            
+            if (!name || !category || !cost || !price) {
+                alert('Please fill required fields!');
+                return;
+            }
+            
+            if (editingItemId) {
+                // Update existing
+                const item = inventory.find(i => i.id === editingItemId);
+                if (item) {
+                    item.name = name;
+                    item.category = category;
+                    item.cost = cost;
+                    item.price = price;
+                    item.link = link;
+                    item.photo = photo;
                 }
-                
-                // Load Orders
-                const ordersResponse = await fetch(
-                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Orders?key=${API_KEY}`
-                );
-                const ordersData = await ordersResponse.json();
-                
-                if (ordersData.values && ordersData.values.length > 1) {
-                    // Clear existing orders to prevent duplicates
-                    orders = [];
-                    
-                    ordersData.values.slice(1).forEach(row => {
-                        // Only add if not already in orders (check by ID)
-                        const id = parseInt(row[0]) || Date.now();
-                        if (!orders.find(order => order.id === id)) {
-                            orders.push({
-                                id: id,
-                                tracking: row[1] || '',
-                                name: row[2] || '',
-                                email: row[3] || '',
-                                phone: row[4] || '',
-                                address: row[5] || '',
-                                productSummary: row[6] || '',
-                                cost: parseFloat(row[7]) || 0,
-                                gross: parseFloat(row[8]) || 0,
-                                profit: parseFloat(row[9]) || 0,
-                                status: row[10] || 'pending',
-                                date: row[11] || new Date().toLocaleDateString(),
-                                products: row[12] ? JSON.parse(row[12]) : []
-                            });
-                        }
-                    });
-                    renderOrders();
-                }
-                
-                console.log('✅ Data loaded from Google Sheets successfully!');
-            } catch (error) {
-                console.error('❌ Error loading from Google Sheets:', error);
-                alert('Could not load data from Google Sheets. Check your API key and Sheet ID.');
+                editingItemId = null;
+                document.querySelector('#inventory .btn-primary').textContent = '➕ Add Item';
+                document.getElementById('cancelItemBtn').style.display = 'none';
+            } else {
+                // Add new
+                inventory.push({
+                    id: Date.now(),
+                    name,
+                    category,
+                    cost,
+                    price,
+                    link,
+                    photo
+                });
+            }
+            
+            renderInventory();
+            saveToGoogleSheets();
+            
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('itemCost').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemLink').value = '';
+            document.getElementById('itemPhoto').value = '';
+        }
+        
+        function editItem(id) {
+            const item = inventory.find(i => i.id === id);
+            if (!item) return;
+            
+            editingItemId = id;
+            document.getElementById('itemName').value = item.name;
+            document.getElementById('itemCategory').value = item.category;
+            document.getElementById('itemCost').value = item.cost;
+            document.getElementById('itemPrice').value = item.price;
+            document.getElementById('itemLink').value = item.link || '';
+            document.getElementById('itemPhoto').value = item.photo || '';
+            
+            document.querySelector('#inventory .btn-primary').textContent = '💾 Update Item';
+            document.getElementById('cancelItemBtn').style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function cancelEditItem() {
+            editingItemId = null;
+            document.getElementById('itemName').value = '';
+            document.getElementById('itemCategory').value = '';
+            document.getElementById('itemCost').value = '';
+            document.getElementById('itemPrice').value = '';
+            document.getElementById('itemLink').value = '';
+            document.getElementById('itemPhoto').value = '';
+            document.querySelector('#inventory .btn-primary').textContent = '➕ Add Item';
+            document.getElementById('cancelItemBtn').style.display = 'none';
+        }
+        
+        function renderInventory() {
+            const search = document.getElementById('searchInventory')?.value.toLowerCase() || '';
+            const filtered = inventory.filter(i => 
+                i.name.toLowerCase().includes(search) || 
+                i.category.toLowerCase().includes(search)
+            );
+            
+            const tbody = document.getElementById('inventoryBody');
+            tbody.innerHTML = filtered.map(item => {
+                const margin = item.price - item.cost;
+                const marginPercent = ((margin / item.cost) * 100).toFixed(1);
+                return `
+                    <tr>
+                        <td><img src="${item.photo || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/></svg>'}" class="item-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/></svg>'"></td>
+                        <td><span class="category-badge">${item.category}</span></td>
+                        <td><strong>${item.name}</strong></td>
+                        <td>৳${item.cost.toFixed(2)}</td>
+                        <td>৳${item.price.toFixed(2)}</td>
+                        <td class="${margin >= 0 ? 'profit-positive' : 'profit-negative'}">৳${margin.toFixed(2)} (${marginPercent}%)</td>
+                        <td>
+                            <button class="btn btn-danger action-btn" onclick="deleteItem(${item.id})">Delete</button>
+                            <button class="btn btn-info action-btn" onclick="editItem(${item.id})">Edit</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function deleteItem(id) {
+            if (confirm('Delete this item?')) {
+                inventory = inventory.filter(i => i.id !== id);
+                renderInventory();
+                saveToGoogleSheets();
             }
         }
         
+        // ORDER FUNCTIONS
+function updateProductDropdown() {
+    const select = document.getElementById('orderProduct');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Select product</option>';
+
+    if (!Array.isArray(inventory) || inventory.length === 0) return;
+
+    // Group by category
+    const categories = {};
+    inventory.forEach(item => {
+        const cat = item.category || 'Other';
+        if (!categories[cat]) categories[cat] = [];
+        categories[cat].push(item);
+    });
+
+    // Render grouped options
+    Object.keys(categories).sort().forEach(category => {
+        const optgroup = document.createElement('optgroup');
+        optgroup.label = category;
+
+        categories[category]
+            .sort((a, b) => a.name.localeCompare(b.name))
+            .forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.id;   // IMPORTANT
+                option.textContent = `${item.name} - ৳${item.price}`;
+                optgroup.appendChild(option);
+            });
+
+        select.appendChild(optgroup);
+    });
+}
+
+        
+        function updateCustomerDropdown() {
+            const select = document.getElementById('orderCustomer');
+            select.innerHTML = '<option value="">Select or add new customer</option>';
+            customers.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.name} - ${c.phone}</option>`;
+            });
+        }
+        
+        function loadCustomerData() {
+            const customerId = document.getElementById('orderCustomer').value;
+            if (!customerId) return;
+            
+            const customer = customers.find(c => c.id == customerId);
+            if (customer) {
+                document.getElementById('orderName').value = customer.name;
+                document.getElementById('orderPhone').value = customer.phone;
+                document.getElementById('orderEmail').value = customer.email || '';
+                document.getElementById('orderAddress').value = customer.address || '';
+                document.getElementById('orderNotes').value = customer.notes || '';
+            }
+        }
+        
+        function addProductToOrder() {
+            const productId = document.getElementById('orderProduct').value;
+            const quantity = parseInt(document.getElementById('orderQuantity').value) || 1;
+            
+            if (!productId) {
+                alert('Select a product!');
+                return;
+            }
+            
+            const product = inventory.find(p => p.id == productId);
+            currentOrderProducts.push({
+                id: product.id,
+                name: product.name,
+                cost: product.cost,
+                price: product.price,
+                quantity
+            });
+            
+            renderOrderProducts();
+            calcOrderTotals();
+        }
+        
+        function renderOrderProducts() {
+            const div = document.getElementById('orderProductsList');
+            div.innerHTML = currentOrderProducts.map((p, i) => `
+                <div class="product-list-item">
+                    <div>${p.name} × ${p.quantity}</div>
+                    <div>
+                        <strong>৳${(p.price * p.quantity).toFixed(2)}</strong>
+                        <button class="btn btn-danger action-btn" onclick="removeOrderProduct(${i})">✖</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function removeOrderProduct(index) {
+            currentOrderProducts.splice(index, 1);
+            renderOrderProducts();
+            calcOrderTotals();
+        }
+        
+        function calcOrderTotals() {
+            const cost = currentOrderProducts.reduce((sum, p) => sum + (p.cost * p.quantity), 0);
+            document.getElementById('orderCost').value = cost.toFixed(2);
+            calcOrderProfit();
+        }
+        
+        function calcOrderProfit() {
+            const cost = parseFloat(document.getElementById('orderCost').value) || 0;
+            const gross = parseFloat(document.getElementById('orderGross').value) || 0;
+            document.getElementById('orderProfit').value = (gross - cost).toFixed(2);
+        }
+        
+        function saveOrder() {
+            const name = document.getElementById('orderName').value.trim();
+            const phone = document.getElementById('orderPhone').value.trim();
+            const email = document.getElementById('orderEmail').value.trim();
+            const address = document.getElementById('orderAddress').value.trim();
+            const notes = document.getElementById('orderNotes').value.trim();
+            const gross = parseFloat(document.getElementById('orderGross').value);
+            const cost = parseFloat(document.getElementById('orderCost').value);
+            const profit = parseFloat(document.getElementById('orderProfit').value);
+            const status = document.getElementById('orderStatus').value;
+            
+            if (!name || !phone || !address || currentOrderProducts.length === 0 || !gross) {
+                alert('Fill required fields and add products!');
+                return;
+            }
+            
+            if (editingOrderId) {
+                // Update existing order
+                const order = orders.find(o => o.id === editingOrderId);
+                if (order) {
+                    order.customerName = name;
+                    order.phone = phone;
+                    order.email = email;
+                    order.address = address;
+                    order.notes = notes;
+                    order.products = [...currentOrderProducts];
+                    order.cost = cost;
+                    order.gross = gross;
+                    order.profit = profit;
+                    order.status = status;
+                }
+                editingOrderId = null;
+                document.querySelector('#orders .btn-primary').textContent = '✅ Create Order';
+                document.getElementById('cancelOrderBtn').style.display = 'none';
+            } else {
+                // Create new order
+                const tracking = 'CC-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                
+                // Save/update customer
+                let customer = customers.find(c => c.phone === phone);
+                if (customer) {
+                    customer.orderCount++;
+                    customer.totalSpent += gross;
+                    customer.notes = notes;
+                } else {
+                    customer = {
+                        id: Date.now(),
+                        name,
+                        phone,
+                        email,
+                        address,
+                        notes,
+                        orderCount: 1,
+                        totalSpent: gross
+                    };
+                    customers.push(customer);
+                }
+                
+                orders.push({
+                    id: Date.now(),
+                    tracking,
+                    customerId: customer.id,
+                    customerName: name,
+                    phone,
+                    email,
+                    address,
+                    notes,
+                    products: [...currentOrderProducts],
+                    cost,
+                    gross,
+                    profit,
+                    status,
+                    date: new Date().toLocaleDateString()
+                });
+                
+                alert(`Order created! Tracking: ${tracking}`);
+            }
+            
+            renderOrders();
+            renderCustomers();
+            saveToGoogleSheets();
+            
+            currentOrderProducts = [];
+            document.getElementById('orderName').value = '';
+            document.getElementById('orderPhone').value = '';
+            document.getElementById('orderEmail').value = '';
+            document.getElementById('orderAddress').value = '';
+            document.getElementById('orderNotes').value = '';
+            document.getElementById('orderGross').value = '';
+            document.getElementById('orderCost').value = '';
+            document.getElementById('orderProfit').value = '';
+            document.getElementById('orderCustomer').value = '';
+            renderOrderProducts();
+        }
+        
+        function editOrder(id) {
+            const order = orders.find(o => o.id === id);
+            if (!order) return;
+            
+            editingOrderId = id;
+            document.getElementById('orderName').value = order.customerName;
+            document.getElementById('orderPhone').value = order.phone;
+            document.getElementById('orderEmail').value = order.email || '';
+            document.getElementById('orderAddress').value = order.address;
+            document.getElementById('orderNotes').value = order.notes || '';
+            document.getElementById('orderStatus').value = order.status;
+            document.getElementById('orderGross').value = order.gross;
+            
+            currentOrderProducts = order.products ? [...order.products] : [];
+            renderOrderProducts();
+            calcOrderTotals();
+            
+            document.querySelector('#orders .btn-primary').textContent = '💾 Update Order';
+            document.getElementById('cancelOrderBtn').style.display = 'inline-block';
+            
+            showSection('orders');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        function cancelEditOrder() {
+            editingOrderId = null;
+            currentOrderProducts = [];
+            document.getElementById('orderName').value = '';
+            document.getElementById('orderPhone').value = '';
+            document.getElementById('orderEmail').value = '';
+            document.getElementById('orderAddress').value = '';
+            document.getElementById('orderNotes').value = '';
+            document.getElementById('orderGross').value = '';
+            document.getElementById('orderCost').value = '';
+            document.getElementById('orderProfit').value = '';
+            document.getElementById('orderCustomer').value = '';
+            renderOrderProducts();
+            document.querySelector('#orders .btn-primary').textContent = '✅ Create Order';
+            document.getElementById('cancelOrderBtn').style.display = 'none';
+        }
+        
+        function renderOrders() {
+            const search = document.getElementById('searchOrders')?.value.toLowerCase() || '';
+            const filtered = orders.filter(o => 
+                o.tracking.toLowerCase().includes(search) || 
+                o.customerName.toLowerCase().includes(search)
+            );
+            
+            const tbody = document.getElementById('ordersBody');
+            tbody.innerHTML = filtered.map(order => `
+                <tr>
+                    <td><strong>${order.tracking}</strong></td>
+                    <td>${order.customerName}<br><small>${order.phone}</small></td>
+<td><small>${
+    (Array.isArray(order.products) ? order.products : [order.products])
+        .flat()
+        .map(p => `${p.name} (${p.quantity})`)
+        .join(', ')
+}</small></td>
+
+                    <td>৳${order.gross.toFixed(2)}</td>
+                    <td class="${order.profit >= 0 ? 'profit-positive' : 'profit-negative'}">৳${order.profit.toFixed(2)}</td>
+                    <td><span class="status-badge status-${order.status}">${order.status}</span></td>
+                    <td>${order.date}</td>
+                    <td>
+                        <button class="btn btn-success action-btn" onclick="viewInvoice('${order.tracking}')">Invoice</button>
+                        <button class="btn btn-info action-btn" onclick="editOrder(${order.id})">Edit</button>
+                        <button class="btn btn-danger action-btn" onclick="deleteOrder(${order.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function deleteOrder(id) {
+            if (confirm('Delete this order?')) {
+                orders = orders.filter(o => o.id !== id);
+                renderOrders();
+                saveToGoogleSheets();
+            }
+        }
+        
+        // CUSTOMER FUNCTIONS
+        function renderCustomers() {
+            const search = document.getElementById('searchCustomers')?.value.toLowerCase() || '';
+            const filtered = customers.filter(c => 
+                c.name.toLowerCase().includes(search) || 
+                c.phone.includes(search)
+            );
+            
+            const tbody = document.getElementById('customersBody');
+            tbody.innerHTML = filtered.map(customer => `
+                <tr>
+                    <td><strong>${customer.name}</strong></td>
+                    <td>${customer.phone}</td>
+                    <td>${customer.email || '-'}</td>
+                    <td>${customer.orderCount || 0}</td>
+                    <td>৳${(customer.totalSpent || 0).toFixed(2)}</td>
+                    <td><small>${customer.notes || '-'}</small></td>
+                    <td>
+                        <button class="btn btn-info action-btn" onclick="viewCustomerOrders(${customer.id})">View Orders</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+        
+        function viewCustomerOrders(customerId) {
+            const customer = customers.find(c => c.id === customerId);
+            const customerOrders = orders.filter(o => o.customerId === customerId);
+            
+            alert(`${customer.name}'s Orders:\n\n` + 
+                customerOrders.map(o => `${o.tracking} - ${o.date} - ৳${o.gross}`).join('\n'));
+        }
+        
+        // INVOICE FUNCTIONS
+        function generateInvoice() {
+            const tracking = document.getElementById('invoiceTracking').value.trim();
+            if (!tracking) {
+                alert('Enter tracking number!');
+                return;
+            }
+            viewInvoice(tracking);
+        }
+        
+        function viewInvoice(tracking) {
+            const order = orders.find(o => o.tracking === tracking);
+            if (!order) {
+                alert('Order not found!');
+                return;
+            }
+            
+            const invoiceHTML = `
+                <div class="invoice">
+                    <div class="invoice-header">
+                        <h1 style="color: #e94560;">🌙 Crescent Charms BD</h1>
+                        <p>Invoice</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px;">
+                        <div>
+                            <h3>Customer Details:</h3>
+                            <p><strong>Name:</strong> ${order.customerName}</p>
+                            <p><strong>Phone:</strong> ${order.phone}</p>
+                            <p><strong>Email:</strong> ${order.email || 'N/A'}</p>
+                            <p><strong>Address:</strong> ${order.address}</p>
+                        </div>
+                        <div>
+                            <h3>Order Details:</h3>
+                            <p><strong>Tracking #:</strong> ${order.tracking}</p>
+                            <p><strong>Date:</strong> ${order.date}</p>
+                            <p><strong>Status:</strong> <span class="status-badge status-${order.status}">${order.status.toUpperCase()}</span></p>
+                        </div>
+                    </div>
+                    
+                    <table style="width: 100%; border: 1px solid #ddd;">
+                        <thead>
+                            <tr style="background: #f5f5f5;">
+                                <th style="padding: 10px; text-align: left;">Product</th>
+                                <th style="padding: 10px; text-align: right;">Qty</th>
+                                <th style="padding: 10px; text-align: right;">Price</th>
+                                <th style="padding: 10px; text-align: right;">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${order.products.map(p => `
+                                <tr>
+                                    <td style="padding: 10px;">${p.name}</td>
+                                    <td style="padding: 10px; text-align: right;">${p.quantity}</td>
+                                    <td style="padding: 10px; text-align: right;">৳${p.price.toFixed(2)}</td>
+                                    <td style="padding: 10px; text-align: right;">৳${(p.price * p.quantity).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    
+                    <div style="margin-top: 30px; text-align: right;">
+                        <h2 style="color: #e94560;">Total: ৳${order.gross.toFixed(2)}</h2>
+                    </div>
+                    
+                    <div style="margin-top: 40px; text-align: center; border-top: 2px solid #eee; padding-top: 20px;">
+                        <p>Thank you for your purchase!</p>
+                        <p style="color: #666;">For queries: contact@crescentcharmsbd.com</p>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('invoiceContent').innerHTML = invoiceHTML;
+            document.getElementById('invoiceModal').style.display = 'block';
+        }
+        
+        function closeInvoice() {
+            document.getElementById('invoiceModal').style.display = 'none';
+        }
+        
+        // DATA PERSISTENCE
         async function saveToGoogleSheets() {
-            if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-                console.log('⚠️ Apps Script not configured. Data saved locally only.');
+            if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL === '') {
+                console.log('⚠️ Google Sheets not configured');
                 return;
             }
             
@@ -534,9 +1113,7 @@
                 await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         sheet: 'Inventory',
                         items: inventory
@@ -547,504 +1124,106 @@
                 await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         sheet: 'Orders',
                         orders: orders
                     })
                 });
                 
-                console.log('✅ Data saved to Google Sheets successfully!');
-            } catch (error) {
-                console.error('❌ Error saving to Google Sheets:', error);
-                alert('Could not save to Google Sheets. Data is saved locally.');
-            }
-        }
-        
-        function showSection(section) {
-            // Check password for inventory
-            if (section === 'inventory' && !isInventoryUnlocked) {
-                const password = prompt('🔒 Enter password to access Inventory:');
-                
-                if (password === INVENTORY_PASSWORD) {
-                    isInventoryUnlocked = true;
-                    alert('✅ Access granted!');
-                } else if (password !== null) {
-                    alert('❌ Incorrect password!');
-                    return;
-                } else {
-                    return; // User cancelled
-                }
-            }
-            
-            // Check password for order tracking
-            if (section === 'orders' && !isOrderTrackingUnlocked) {
-                const password = prompt('🔒 Enter password to access Order Tracking:');
-                
-                if (password === ORDER_TRACKING_PASSWORD) {
-                    isOrderTrackingUnlocked = true;
-                    alert('✅ Access granted!');
-                } else if (password !== null) {
-                    alert('❌ Incorrect password!');
-                    return;
-                } else {
-                    return; // User cancelled
-                }
-            }
-            
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            
-            document.getElementById(section).classList.add('active');
-            event.target.classList.add('active');
-        }
-        
-        function addItem() {
-            const name = document.getElementById('itemName').value.trim();
-            const category = document.getElementById('itemCategory').value;
-            const price = document.getElementById('itemPrice').value.trim();
-            const link = document.getElementById('itemLink').value.trim();
-            const photo = document.getElementById('itemPhoto').value.trim();
-            
-            if (!name || !category || !price) {
-                alert('Please fill in item name, category, and price!');
-                return;
-            }
-            
-            const item = {
-                id: Date.now(),
-                name,
-                category,
-                price: parseFloat(price),
-                link,
-                photo
-            };
-            
-            inventory.push(item);
-            renderInventory();
-            saveToGoogleSheets();
-            
-            document.getElementById('itemName').value = '';
-            document.getElementById('itemCategory').value = '';
-            document.getElementById('itemPrice').value = '';
-            document.getElementById('itemLink').value = '';
-            document.getElementById('itemPhoto').value = '';
-        }
-        
-        function removeItem(id) {
-            if (confirm('Are you sure you want to remove this item?')) {
-                inventory = inventory.filter(item => item.id !== id);
-                renderInventory();
-                saveToGoogleSheets();
-            }
-        }
-        
-        function cleanDuplicates() {
-            if (!confirm('This will remove duplicate items from inventory. Continue?')) {
-                return;
-            }
-            
-            const seen = new Map();
-            const cleaned = [];
-            
-            inventory.forEach(item => {
-                // Use name + price as unique identifier
-                const key = `${item.name.toLowerCase()}-${item.price}`;
-                if (!seen.has(key)) {
-                    seen.set(key, true);
-                    cleaned.push(item);
-                }
-            });
-            
-            const removedCount = inventory.length - cleaned.length;
-            inventory = cleaned;
-            renderInventory();
-            saveToGoogleSheets();
-            
-            alert(`✅ Removed ${removedCount} duplicate items!`);
-        }
-        
-        function renderInventory() {
-            const tbody = document.getElementById('inventoryBody');
-            
-            if (inventory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><h3>No items in inventory</h3><p>Add your first item to get started!</p></td></tr>';
-                updateProductDropdown();
-                return;
-            }
-            
-            // Filter and sort inventory
-            let displayItems = [...inventory];
-            
-            // Filter by category
-            if (currentCategory !== 'all') {
-                displayItems = displayItems.filter(item => item.category === currentCategory);
-            }
-            
-            // Sort by category first, then by name
-            displayItems.sort((a, b) => {
-                // First sort by category
-                const catCompare = (a.category || 'Other').localeCompare(b.category || 'Other');
-                if (catCompare !== 0) return catCompare;
-                
-                // Then sort by name within same category
-                const nameCompare = a.name.localeCompare(b.name);
-                return sortAscending ? nameCompare : -nameCompare;
-            });
-            
-            if (displayItems.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><h3>No items in this category</h3></td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = displayItems.map(item => `
-                <tr>
-                    <td>
-                        ${item.photo ? 
-                            `<img src="${item.photo}" class="item-image" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                             <div style="display:none; color:#999; font-size:12px;">No Image</div>` 
-                            : '<span style="color: #999;">No image</span>'}
-                    </td>
-                    <td><span style="background: #e94560; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">${item.category || 'Other'}</span></td>
-                    <td><strong>${item.name}</strong></td>
-                    <td>৳${item.price.toFixed(2)}</td>
-                    <td>${item.link ? `<a href="${item.link}" target="_blank" style="color: #e94560;">🔗 View</a>` : '-'}</td>
-                    <td>
-                        <button class="btn btn-danger action-btn" onclick="removeItem(${item.id})">Remove</button>
-                    </td>
-                </tr>
-            `).join('');
-            
-            updateProductDropdown();
-        }
-        
-        function filterByCategory() {
-            currentCategory = document.getElementById('categoryFilter').value;
-            renderInventory();
-        }
-        
-        function toggleSort() {
-            sortAscending = !sortAscending;
-            document.getElementById('sortIcon').textContent = sortAscending ? '📊' : '📉';
-            renderInventory();
-        }
-        
-        function updateProductDropdown() {
-            const select = document.getElementById('orderProduct');
-            select.innerHTML = '<option value="">Select a product</option>';
-            
-            // Group by category
-            const categories = {};
-            inventory.forEach(item => {
-                const cat = item.category || 'Other';
-                if (!categories[cat]) categories[cat] = [];
-                categories[cat].push(item);
-            });
-            
-            // Add options grouped by category
-            Object.keys(categories).sort().forEach(category => {
-                const optgroup = document.createElement('optgroup');
-                optgroup.label = category;
-                
-                categories[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
-                    const option = document.createElement('option');
-                    option.value = JSON.stringify({id: item.id, name: item.name, price: item.price, category: item.category});
-                    option.textContent = `${item.name} - ৳${item.price.toFixed(2)}`;
-                    optgroup.appendChild(option);
+                // Save Customers
+                await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sheet: 'Customers',
+                        customers: customers
+                    })
                 });
                 
-                select.appendChild(optgroup);
-            });
-        }
-        
-        function calculateProfit() {
-            const productSelect = document.getElementById('orderProduct');
-            const grossInput = document.getElementById('orderGross');
-            const profitInput = document.getElementById('orderProfit');
-            
-            if (productSelect.value && grossInput.value) {
-                const product = JSON.parse(productSelect.value);
-                const gross = parseFloat(grossInput.value);
-                const profit = gross - product.price;
-                profitInput.value = profit.toFixed(2);
-            } else {
-                profitInput.value = '';
+                console.log('✅ Data saved to Google Sheets!');
+            } catch (error) {
+                console.error('❌ Error saving to Google Sheets:', error);
             }
         }
         
-        function addProductToOrder() {
-            const productSelect = document.getElementById('orderProduct');
-            const quantityInput = document.getElementById('orderQuantity');
-            
-            if (!productSelect.value) {
-                alert('Please select a product!');
-                return;
-            }
-            
-            const product = JSON.parse(productSelect.value);
-            const quantity = parseInt(quantityInput.value) || 1;
-            
-            currentOrderProducts.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                quantity: quantity,
-                total: product.price * quantity
-            });
-            
-            renderOrderProducts();
-            calculateOrderTotals();
-            
-            // Reset selection
-            productSelect.value = '';
-            quantityInput.value = '1';
-        }
-        
-        function removeProductFromOrder(index) {
-            currentOrderProducts.splice(index, 1);
-            renderOrderProducts();
-            calculateOrderTotals();
-        }
-        
-        function renderOrderProducts() {
-            const container = document.getElementById('productsList');
-            
-            if (currentOrderProducts.length === 0) {
-                container.innerHTML = '<p style="color: #999; font-style: italic;">No products added yet. Add products above.</p>';
-                return;
-            }
-            
-            container.innerHTML = `
-                <div style="background: #f5f5f5; padding: 15px; border-radius: 8px;">
-                    ${currentOrderProducts.map((item, index) => `
-                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; background: white; margin-bottom: 10px; border-radius: 6px;">
-                            <div>
-                                <strong>${item.name}</strong> × ${item.quantity}
-                                <span style="color: #666; margin-left: 10px;">৳${item.price.toFixed(2)} each</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 15px;">
-                                <strong style="color: #0f3460;">৳${item.total.toFixed(2)}</strong>
-                                <button onclick="removeProductFromOrder(${index})" style="background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Remove</button>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-        
-        function calculateOrderTotals() {
-            const totalCost = currentOrderProducts.reduce((sum, item) => sum + item.total, 0);
-            document.getElementById('orderCost').value = totalCost.toFixed(2);
-            calculateOrderProfit();
-        }
-        
-        function calculateOrderProfit() {
-            const costInput = document.getElementById('orderCost');
-            const grossInput = document.getElementById('orderGross');
-            const profitInput = document.getElementById('orderProfit');
-            
-            if (costInput.value && grossInput.value) {
-                const cost = parseFloat(costInput.value);
-                const gross = parseFloat(grossInput.value);
-                const profit = gross - cost;
-                profitInput.value = profit.toFixed(2);
-            } else {
-                profitInput.value = '';
+        async function loadFromGoogleSheets() {
+            try {
+                // Load Inventory
+                const invResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Inventory?key=${API_KEY}`
+                );
+                const invData = await invResponse.json();
+                if (invData.values && invData.values.length > 1) {
+                    inventory = invData.values.slice(1).map(row => ({
+                        id: parseInt(row[0]) || Date.now(),
+                        name: row[1] || '',
+                        category: row[2] || '',
+                        cost: parseFloat(row[3]) || 0,
+                        price: parseFloat(row[4]) || 0,
+                        link: row[5] || '',
+                        photo: row[6] || ''
+                    }));
+                }
+                
+                // Load Orders
+                const ordResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Orders?key=${API_KEY}`
+                );
+                const ordData = await ordResponse.json();
+                if (ordData.values && ordData.values.length > 1) {
+                    orders = ordData.values.slice(1).map(row => ({
+                        id: parseInt(row[0]) || Date.now(),
+                        tracking: row[1] || '',
+                        customerId: parseInt(row[2]) || 0,
+                        customerName: row[3] || '',
+                        phone: row[4] || '',
+                        email: row[5] || '',
+                        address: row[6] || '',
+                        notes: row[7] || '',
+                        products: row[8] ? JSON.parse(row[8]) : [],
+                        cost: parseFloat(row[9]) || 0,
+                        gross: parseFloat(row[10]) || 0,
+                        profit: parseFloat(row[11]) || 0,
+                        status: row[12] || 'pending',
+                        date: row[13] || ''
+                    }));
+                }
+                
+                // Load Customers
+                const custResponse = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Customers?key=${API_KEY}`
+                );
+                const custData = await custResponse.json();
+                if (custData.values && custData.values.length > 1) {
+                    customers = custData.values.slice(1).map(row => ({
+                        id: parseInt(row[0]) || Date.now(),
+                        name: row[1] || '',
+                        phone: row[2] || '',
+                        email: row[3] || '',
+                        address: row[4] || '',
+                        notes: row[5] || '',
+                        orderCount: parseInt(row[6]) || 0,
+                        totalSpent: parseFloat(row[7]) || 0
+                    }));
+                }
+                
+                console.log('✅ Data loaded from Google Sheets!');
+            } catch (error) {
+                console.error('❌ Error loading from Google Sheets:', error);
             }
         }
         
-        function addOrder() {
-            const name = document.getElementById('orderName').value.trim();
-            const email = document.getElementById('orderEmail').value.trim();
-            const phone = document.getElementById('orderPhone').value.trim();
-            const address = document.getElementById('orderAddress').value.trim();
-            const status = document.getElementById('orderStatus').value;
-            const cost = document.getElementById('orderCost').value.trim();
-            const gross = document.getElementById('orderGross').value.trim();
-            const profit = document.getElementById('orderProfit').value.trim();
-            
-            if (!name || !phone || !address || currentOrderProducts.length === 0 || !gross) {
-                alert('Please fill in customer name, phone, address, add at least one product, and enter gross amount!');
-                return;
-            }
-            
-            const tracking = `CC-${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
-            
-            // Create product summary string
-            const productSummary = currentOrderProducts.map(p => `${p.name} (${p.quantity}x)`).join(', ');
-            
-            const order = {
-                id: Date.now(),
-                tracking,
-                name,
-                email,
-                phone,
-                address,
-                products: [...currentOrderProducts], // Store full product details
-                productSummary: productSummary,
-                cost: parseFloat(cost),
-                gross: parseFloat(gross),
-                profit: parseFloat(profit),
-                status,
-                date: new Date().toLocaleDateString()
-            };
-            
-            orders.push(order);
-            renderOrders();
-            saveToGoogleSheets();
-            
-            // Clear form
-            document.getElementById('orderName').value = '';
-            document.getElementById('orderEmail').value = '';
-            document.getElementById('orderPhone').value = '';
-            document.getElementById('orderAddress').value = '';
-            document.getElementById('orderStatus').value = 'pending';
-            document.getElementById('orderProduct').value = '';
-            document.getElementById('orderQuantity').value = '1';
-            document.getElementById('orderCost').value = '';
-            document.getElementById('orderGross').value = '';
-            document.getElementById('orderProfit').value = '';
-            
-            currentOrderProducts = [];
-            renderOrderProducts();
-            
-            alert(`Order created! Tracking number: ${tracking}`);
-        }
+        // Initialize - Load data on page load
+        window.addEventListener('load', loadFromGoogleSheets);
         
-        function updateOrderStatus(id, newStatus) {
-            const order = orders.find(o => o.id === id);
-            if (order) {
-                order.status = newStatus;
-                renderOrders();
-                saveToGoogleSheets();
+        // Initialize
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('invoiceModal')) {
+                closeInvoice();
             }
         }
-        
-        function removeOrder(id) {
-            if (confirm('Are you sure you want to remove this order?')) {
-                orders = orders.filter(order => order.id !== id);
-                renderOrders();
-                saveToGoogleSheets();
-            }
-        }
-        
-        function renderOrders() {
-            const tbody = document.getElementById('ordersBody');
-            
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><h3>No orders yet</h3><p>Add your first order to start tracking!</p></td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = orders.map(order => `
-                <tr>
-                    <td><strong>${order.tracking}</strong></td>
-                    <td>${order.name}</td>
-                    <td>${order.phone}</td>
-                    <td><span style="font-size: 13px;">${order.productSummary || order.product || '-'}</span></td>
-                    <td>৳${order.cost ? order.cost.toFixed(2) : (order.productPrice ? order.productPrice.toFixed(2) : '0.00')}</td>
-                    <td>৳${order.gross ? order.gross.toFixed(2) : '0.00'}</td>
-                    <td style="color: ${order.profit >= 0 ? '#155724' : '#721c24'}; font-weight: bold;">৳${order.profit ? order.profit.toFixed(2) : '0.00'}</td>
-                    <td><span style="color: #666; font-size: 14px;">${order.date}</span></td>
-                    <td>
-                        <select class="status-badge status-${order.status}" onchange="updateOrderStatus(${order.id}, this.value)" style="border: none; font-weight: bold; cursor: pointer;">
-                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
-                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
-                            <option value="canceled" ${order.status === 'canceled' ? 'selected' : ''}>❌ Canceled</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger action-btn" onclick="removeOrder(${order.id})">Remove</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        function searchInventory() {
-            const search = document.getElementById('searchInventory').value.toLowerCase();
-            const filtered = inventory.filter(item => 
-                item.name.toLowerCase().includes(search) ||
-                (item.category && item.category.toLowerCase().includes(search)) ||
-                item.price.toString().includes(search)
-            );
-            
-            const tbody = document.getElementById('inventoryBody');
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><h3>No results found</h3></td></tr>';
-                return;
-            }
-            
-            // Sort filtered results
-            filtered.sort((a, b) => {
-                const catCompare = (a.category || 'Other').localeCompare(b.category || 'Other');
-                if (catCompare !== 0) return catCompare;
-                const nameCompare = a.name.localeCompare(b.name);
-                return sortAscending ? nameCompare : -nameCompare;
-            });
-            
-            tbody.innerHTML = filtered.map(item => `
-                <tr>
-                    <td>
-                        ${item.photo ? 
-                            `<img src="${item.photo}" class="item-image" alt="${item.name}" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                             <div style="display:none; color:#999; font-size:12px;">No Image</div>` 
-                            : '<span style="color: #999;">No image</span>'}
-                    </td>
-                    <td><span style="background: #e94560; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">${item.category || 'Other'}</span></td>
-                    <td><strong>${item.name}</strong></td>
-                    <td>৳${item.price.toFixed(2)}</td>
-                    <td>${item.link ? `<a href="${item.link}" target="_blank" style="color: #e94560;">🔗 View</a>` : '-'}</td>
-                    <td>
-                        <button class="btn btn-danger action-btn" onclick="removeItem(${item.id})">Remove</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        function searchOrders() {
-            const search = document.getElementById('searchOrders').value.toLowerCase();
-            const filtered = orders.filter(order => 
-                order.tracking.toLowerCase().includes(search) ||
-                order.name.toLowerCase().includes(search) ||
-                order.phone.includes(search) ||
-                (order.productSummary && order.productSummary.toLowerCase().includes(search)) ||
-                (order.product && order.product.toLowerCase().includes(search))
-            );
-            
-            const tbody = document.getElementById('ordersBody');
-            if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="10" class="empty-state"><h3>No results found</h3></td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = filtered.map(order => `
-                <tr>
-                    <td><strong>${order.tracking}</strong></td>
-                    <td>${order.name}</td>
-                    <td>${order.phone}</td>
-                    <td><span style="font-size: 13px;">${order.productSummary || order.product || '-'}</span></td>
-                    <td>৳${order.cost ? order.cost.toFixed(2) : (order.productPrice ? order.productPrice.toFixed(2) : '0.00')}</td>
-                    <td>৳${order.gross ? order.gross.toFixed(2) : '0.00'}</td>
-                    <td style="color: ${order.profit >= 0 ? '#155724' : '#721c24'}; font-weight: bold;">৳${order.profit ? order.profit.toFixed(2) : '0.00'}</td>
-                    <td><span style="color: #666; font-size: 14px;">${order.date}</span></td>
-                    <td>
-                        <select class="status-badge status-${order.status}" onchange="updateOrderStatus(${order.id}, this.value)" style="border: none; font-weight: bold; cursor: pointer;">
-                            <option value="pending" ${order.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
-                            <option value="delivered" ${order.status === 'delivered' ? 'selected' : ''}>✅ Delivered</option>
-                            <option value="canceled" ${order.status === 'canceled' ? 'selected' : ''}>❌ Canceled</option>
-                        </select>
-                    </td>
-                    <td>
-                        <button class="btn btn-danger action-btn" onclick="removeOrder(${order.id})">Remove</button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-        
-        renderInventory();
-        renderOrders();
     </script>
 </body>
 </html>
