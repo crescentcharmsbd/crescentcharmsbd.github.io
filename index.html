@@ -395,7 +395,6 @@
         const INVENTORY_PASSWORD = 'Crescent@@4545T'; 
         let isOrderTrackingUnlocked = false;
         let isInventoryUnlocked = false;
-        
         let inventory = [];
         let orders = [];
         let trackingCounter = 1;
@@ -424,13 +423,22 @@
                 const inventoryData = await inventoryResponse.json();
                 
                 if (inventoryData.values && inventoryData.values.length > 1) {
-                    inventory = inventoryData.values.slice(1).map(row => ({
-                        id: parseInt(row[0]) || Date.now(),
-                        name: row[1] || '',
-                        price: parseFloat(row[2]) || 0,
-                        link: row[3] || '',
-                        photo: row[4] || ''
-                    }));
+                    // Clear existing inventory to prevent duplicates
+                    inventory = [];
+                    
+                    inventoryData.values.slice(1).forEach(row => {
+                        // Only add if not already in inventory (check by ID)
+                        const id = parseInt(row[0]) || Date.now();
+                        if (!inventory.find(item => item.id === id)) {
+                            inventory.push({
+                                id: id,
+                                name: row[1] || '',
+                                price: parseFloat(row[2]) || 0,
+                                link: row[3] || '',
+                                photo: row[4] || ''
+                            });
+                        }
+                    });
                     renderInventory();
                 }
                 
@@ -441,21 +449,30 @@
                 const ordersData = await ordersResponse.json();
                 
                 if (ordersData.values && ordersData.values.length > 1) {
-                    orders = ordersData.values.slice(1).map(row => ({
-                        id: parseInt(row[0]) || Date.now(),
-                        tracking: row[1] || '',
-                        name: row[2] || '',
-                        email: row[3] || '',
-                        phone: row[4] || '',
-                        address: row[5] || '',
-                        productSummary: row[6] || '',
-                        cost: parseFloat(row[7]) || 0,
-                        gross: parseFloat(row[8]) || 0,
-                        profit: parseFloat(row[9]) || 0,
-                        status: row[10] || 'pending',
-                        date: row[11] || new Date().toLocaleDateString(),
-                        products: row[12] ? JSON.parse(row[12]) : []
-                    }));
+                    // Clear existing orders to prevent duplicates
+                    orders = [];
+                    
+                    ordersData.values.slice(1).forEach(row => {
+                        // Only add if not already in orders (check by ID)
+                        const id = parseInt(row[0]) || Date.now();
+                        if (!orders.find(order => order.id === id)) {
+                            orders.push({
+                                id: id,
+                                tracking: row[1] || '',
+                                name: row[2] || '',
+                                email: row[3] || '',
+                                phone: row[4] || '',
+                                address: row[5] || '',
+                                productSummary: row[6] || '',
+                                cost: parseFloat(row[7]) || 0,
+                                gross: parseFloat(row[8]) || 0,
+                                profit: parseFloat(row[9]) || 0,
+                                status: row[10] || 'pending',
+                                date: row[11] || new Date().toLocaleDateString(),
+                                products: row[12] ? JSON.parse(row[12]) : []
+                            });
+                        }
+                    });
                     renderOrders();
                 }
                 
@@ -901,4 +918,3 @@
     </script>
 </body>
 </html>
-
