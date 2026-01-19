@@ -249,37 +249,73 @@
         
         <!-- Inventory Section -->
         <div id="inventory" class="section">
-            <h2>Inventory Management</h2>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2>Inventory Management</h2>
+                <button class="btn btn-danger" onclick="cleanDuplicates()" style="font-size: 14px;">🧹 Clean Duplicates</button>
+            </div>
             <div class="form-row" style="margin-top: 30px;">
                 <div class="form-group">
                     <label>Item Name *</label>
                     <input type="text" id="itemName" placeholder="Enter item name">
                 </div>
                 <div class="form-group">
-                    <label>Price (BDT) *</label>
-                    <input type="number" id="itemPrice" placeholder="Enter price">
+                    <label>Category *</label>
+                    <select id="itemCategory">
+                        <option value="">Select category</option>
+                        <option value="Bracelets">Bracelets</option>
+                        <option value="Necklaces">Necklaces</option>
+                        <option value="Earrings">Earrings</option>
+                        <option value="Rings">Rings</option>
+                        <option value="Anklets">Anklets</option>
+                        <option value="Charms">Charms</option>
+                        <option value="Sets">Sets</option>
+                        <option value="Other">Other</option>
+                    </select>
                 </div>
             </div>
             <div class="form-row">
                 <div class="form-group">
+                    <label>Price (BDT) *</label>
+                    <input type="number" id="itemPrice" placeholder="Enter price">
+                </div>
+                <div class="form-group">
                     <label>Product Link</label>
                     <input type="url" id="itemLink" placeholder="https://example.com/product">
                 </div>
-                <div class="form-group">
-                    <label>Photo URL</label>
-                    <input type="url" id="itemPhoto" placeholder="https://example.com/image.jpg">
-                </div>
+            </div>
+            <div class="form-group">
+                <label>Photo URL</label>
+                <input type="url" id="itemPhoto" placeholder="https://example.com/image.jpg">
             </div>
             <button class="btn btn-primary" onclick="addItem()">➕ Add Item</button>
             
-            <div class="search-box" style="margin-top: 40px;">
-                <input type="text" id="searchInventory" placeholder="🔍 Search inventory..." onkeyup="searchInventory()">
+            <div style="margin-top: 40px; display: flex; gap: 15px; align-items: center;">
+                <div class="search-box" style="flex: 1; margin: 0;">
+                    <input type="text" id="searchInventory" placeholder="🔍 Search inventory..." onkeyup="searchInventory()">
+                </div>
+                <div style="min-width: 200px;">
+                    <select id="categoryFilter" onchange="filterByCategory()" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 16px;">
+                        <option value="all">All Categories</option>
+                        <option value="Bracelets">Bracelets</option>
+                        <option value="Necklaces">Necklaces</option>
+                        <option value="Earrings">Earrings</option>
+                        <option value="Rings">Rings</option>
+                        <option value="Anklets">Anklets</option>
+                        <option value="Charms">Charms</option>
+                        <option value="Sets">Sets</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="toggleSort()" style="background: #0f3460; color: white; white-space: nowrap;">
+                    <span id="sortIcon">📊</span> Sort A-Z
+                </button>
             </div>
             
             <table id="inventoryTable">
                 <thead>
                     <tr>
                         <th>Photo</th>
+                        <th>Category</th>
                         <th>Name</th>
                         <th>Price (BDT)</th>
                         <th>Link</th>
@@ -395,10 +431,13 @@
         const INVENTORY_PASSWORD = 'Crescent@@4545T'; 
         let isOrderTrackingUnlocked = false;
         let isInventoryUnlocked = false;
+        
         let inventory = [];
         let orders = [];
         let trackingCounter = 1;
         let currentOrderProducts = []; // Temporary storage for products being added to current order
+        let sortAscending = true;
+        let currentCategory = 'all';
         
         // Load data from Google Sheets on page load
         window.addEventListener('load', () => {
@@ -433,9 +472,10 @@
                             inventory.push({
                                 id: id,
                                 name: row[1] || '',
-                                price: parseFloat(row[2]) || 0,
-                                link: row[3] || '',
-                                photo: row[4] || ''
+                                category: row[2] || 'Other',
+                                price: parseFloat(row[3]) || 0,
+                                link: row[4] || '',
+                                photo: row[5] || ''
                             });
                         }
                     });
@@ -563,18 +603,20 @@
         
         function addItem() {
             const name = document.getElementById('itemName').value.trim();
+            const category = document.getElementById('itemCategory').value;
             const price = document.getElementById('itemPrice').value.trim();
             const link = document.getElementById('itemLink').value.trim();
             const photo = document.getElementById('itemPhoto').value.trim();
             
-            if (!name || !price) {
-                alert('Please fill in item name and price!');
+            if (!name || !category || !price) {
+                alert('Please fill in item name, category, and price!');
                 return;
             }
             
             const item = {
                 id: Date.now(),
                 name,
+                category,
                 price: parseFloat(price),
                 link,
                 photo
@@ -585,6 +627,7 @@
             saveToGoogleSheets();
             
             document.getElementById('itemName').value = '';
+            document.getElementById('itemCategory').value = '';
             document.getElementById('itemPrice').value = '';
             document.getElementById('itemLink').value = '';
             document.getElementById('itemPhoto').value = '';
@@ -598,16 +641,65 @@
             }
         }
         
+        function cleanDuplicates() {
+            if (!confirm('This will remove duplicate items from inventory. Continue?')) {
+                return;
+            }
+            
+            const seen = new Map();
+            const cleaned = [];
+            
+            inventory.forEach(item => {
+                // Use name + price as unique identifier
+                const key = `${item.name.toLowerCase()}-${item.price}`;
+                if (!seen.has(key)) {
+                    seen.set(key, true);
+                    cleaned.push(item);
+                }
+            });
+            
+            const removedCount = inventory.length - cleaned.length;
+            inventory = cleaned;
+            renderInventory();
+            saveToGoogleSheets();
+            
+            alert(`✅ Removed ${removedCount} duplicate items!`);
+        }
+        
         function renderInventory() {
             const tbody = document.getElementById('inventoryBody');
             
             if (inventory.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>No items in inventory</h3><p>Add your first item to get started!</p></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><h3>No items in inventory</h3><p>Add your first item to get started!</p></td></tr>';
                 updateProductDropdown();
                 return;
             }
             
-            tbody.innerHTML = inventory.map(item => `
+            // Filter and sort inventory
+            let displayItems = [...inventory];
+            
+            // Filter by category
+            if (currentCategory !== 'all') {
+                displayItems = displayItems.filter(item => item.category === currentCategory);
+            }
+            
+            // Sort by category first, then by name
+            displayItems.sort((a, b) => {
+                // First sort by category
+                const catCompare = (a.category || 'Other').localeCompare(b.category || 'Other');
+                if (catCompare !== 0) return catCompare;
+                
+                // Then sort by name within same category
+                const nameCompare = a.name.localeCompare(b.name);
+                return sortAscending ? nameCompare : -nameCompare;
+            });
+            
+            if (displayItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><h3>No items in this category</h3></td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = displayItems.map(item => `
                 <tr>
                     <td>
                         ${item.photo ? 
@@ -615,6 +707,7 @@
                              <div style="display:none; color:#999; font-size:12px;">No Image</div>` 
                             : '<span style="color: #999;">No image</span>'}
                     </td>
+                    <td><span style="background: #e94560; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">${item.category || 'Other'}</span></td>
                     <td><strong>${item.name}</strong></td>
                     <td>৳${item.price.toFixed(2)}</td>
                     <td>${item.link ? `<a href="${item.link}" target="_blank" style="color: #e94560;">🔗 View</a>` : '-'}</td>
@@ -627,15 +720,42 @@
             updateProductDropdown();
         }
         
+        function filterByCategory() {
+            currentCategory = document.getElementById('categoryFilter').value;
+            renderInventory();
+        }
+        
+        function toggleSort() {
+            sortAscending = !sortAscending;
+            document.getElementById('sortIcon').textContent = sortAscending ? '📊' : '📉';
+            renderInventory();
+        }
+        
         function updateProductDropdown() {
             const select = document.getElementById('orderProduct');
             select.innerHTML = '<option value="">Select a product</option>';
             
+            // Group by category
+            const categories = {};
             inventory.forEach(item => {
-                const option = document.createElement('option');
-                option.value = JSON.stringify({id: item.id, name: item.name, price: item.price});
-                option.textContent = `${item.name} - ৳${item.price.toFixed(2)}`;
-                select.appendChild(option);
+                const cat = item.category || 'Other';
+                if (!categories[cat]) categories[cat] = [];
+                categories[cat].push(item);
+            });
+            
+            // Add options grouped by category
+            Object.keys(categories).sort().forEach(category => {
+                const optgroup = document.createElement('optgroup');
+                optgroup.label = category;
+                
+                categories[category].sort((a, b) => a.name.localeCompare(b.name)).forEach(item => {
+                    const option = document.createElement('option');
+                    option.value = JSON.stringify({id: item.id, name: item.name, price: item.price, category: item.category});
+                    option.textContent = `${item.name} - ৳${item.price.toFixed(2)}`;
+                    optgroup.appendChild(option);
+                });
+                
+                select.appendChild(optgroup);
             });
         }
         
@@ -846,14 +966,23 @@
             const search = document.getElementById('searchInventory').value.toLowerCase();
             const filtered = inventory.filter(item => 
                 item.name.toLowerCase().includes(search) ||
+                (item.category && item.category.toLowerCase().includes(search)) ||
                 item.price.toString().includes(search)
             );
             
             const tbody = document.getElementById('inventoryBody');
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><h3>No results found</h3></td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><h3>No results found</h3></td></tr>';
                 return;
             }
+            
+            // Sort filtered results
+            filtered.sort((a, b) => {
+                const catCompare = (a.category || 'Other').localeCompare(b.category || 'Other');
+                if (catCompare !== 0) return catCompare;
+                const nameCompare = a.name.localeCompare(b.name);
+                return sortAscending ? nameCompare : -nameCompare;
+            });
             
             tbody.innerHTML = filtered.map(item => `
                 <tr>
@@ -863,6 +992,7 @@
                              <div style="display:none; color:#999; font-size:12px;">No Image</div>` 
                             : '<span style="color: #999;">No image</span>'}
                     </td>
+                    <td><span style="background: #e94560; color: white; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">${item.category || 'Other'}</span></td>
                     <td><strong>${item.name}</strong></td>
                     <td>৳${item.price.toFixed(2)}</td>
                     <td>${item.link ? `<a href="${item.link}" target="_blank" style="color: #e94560;">🔗 View</a>` : '-'}</td>
