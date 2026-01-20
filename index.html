@@ -323,6 +323,66 @@
         .category-row td {
     border-top: 2px solid #ddd;
 }
+.btn-secondary {
+    background: #6c757d;
+    color: #fff;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+    color: #fff;
+}
+
+.btn-secondary:active {
+    transform: scale(0.96);
+}
+.action-btn {
+    margin: 2px;
+}
+.category-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #0f3460, #1a5cff);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: .3px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    transition: all .2s ease;
+    cursor: default;
+}
+
+.category-badge:hover {
+    transform: translateY(-1px) scale(1.05);
+    box-shadow: 0 4px 10px rgba(0,0,0,.2);
+}
+#categoryFilter {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: linear-gradient(135deg, #ffffff, #f3f6ff);
+    font-size: 14px;
+    font-weight: 600;
+    color: #0f3460;
+    outline: none;
+    cursor: pointer;
+    min-width: 180px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.08);
+    transition: all .2s ease;
+}
+
+#categoryFilter:hover {
+    border-color: #1a5cff;
+    box-shadow: 0 4px 10px rgba(0,0,0,.12);
+}
+
+#categoryFilter:focus {
+    border-color: #1a5cff;
+    box-shadow: 0 0 0 3px rgba(26,92,255,.15);
+}
+
 
     </style>
 </head>
@@ -735,10 +795,17 @@ let filtered = inventory.filter(i => {
                 <td class="${margin >= 0 ? 'profit-positive' : 'profit-negative'}">
                     ৳${margin.toFixed(2)} (${marginPercent}%)
                 </td>
-                <td>
-                    <button class="btn btn-danger action-btn" onclick="deleteItem(${item.id})">Delete</button>
-                    <button class="btn btn-info action-btn" onclick="editItem(${item.id})">Edit</button>
-                </td>
+<td>
+    ${item.link ? `
+        <a href="${item.link}" target="_blank" class="btn btn-secondary action-btn">
+            View
+        </a>
+    ` : ''}
+
+    <button class="btn btn-info action-btn" onclick="editItem(${item.id})">Edit</button>
+    <button class="btn btn-danger action-btn" onclick="deleteItem(${item.id})">Delete</button>
+</td>
+
             </tr>
         `;
     });
@@ -978,8 +1045,6 @@ function updateProductDropdown() {
             currentOrderProducts = order.products ? [...order.products] : [];
             renderOrderProducts();
             calcOrderTotals();
-            recalcCustomersFromOrders();
-
             
             document.querySelector('#orders .btn-primary').textContent = '💾 Update Order';
             document.getElementById('cancelOrderBtn').style.display = 'inline-block';
@@ -1039,12 +1104,9 @@ function updateProductDropdown() {
         
         function deleteOrder(id) {
             if (confirm('Delete this order?')) {
-orders = orders.filter(o => o.id !== id);
-recalcCustomersFromOrders();
-renderOrders();
-renderCustomers();
-saveToGoogleSheets();
-
+                orders = orders.filter(o => o.id !== id);
+                renderOrders();
+                saveToGoogleSheets();
             }
         }
         
@@ -1062,16 +1124,12 @@ saveToGoogleSheets();
                     <td><strong>${customer.name}</strong></td>
                     <td>${customer.phone}</td>
                     <td>${customer.email || '-'}</td>
-<td>${Number(customer.orderCount || 0)}</td>
-<td>৳${Number(customer.totalSpent || 0).toFixed(2)}</td>
-
+                    <td>${customer.orderCount || 0}</td>
+                    <td>৳${(customer.totalSpent || 0).toFixed(2)}</td>
                     <td><small>${customer.notes || '-'}</small></td>
-<td>
-    <button class="btn btn-info action-btn" onclick="openCustomerPopup(${customer.id})">Orders</button>
-    <button class="btn btn-success action-btn" onclick="editCustomer(${customer.id})">Edit</button>
-    <button class="btn btn-danger action-btn" onclick="deleteCustomer(${customer.id})">Delete</button>
-</td>
-
+                    <td>
+                        <button class="btn btn-info action-btn" onclick="viewCustomerOrders(${customer.id})">View Orders</button>
+                    </td>
                 </tr>
             `).join('');
         }
@@ -1303,124 +1361,7 @@ saveToGoogleSheets();
         select.appendChild(opt);
     });
 }
-function recalcCustomersFromOrders() {
-    const map = {};
-
-    orders.forEach(o => {
-        if (!map[o.customerId]) {
-            map[o.customerId] = {
-                id: o.customerId,
-                name: o.customerName,
-                phone: o.phone,
-                email: o.email,
-                address: o.address,
-                notes: o.notes,
-                orderCount: 0,
-                totalSpent: 0
-            };
-        }
-
-        map[o.customerId].orderCount++;
-        map[o.customerId].totalSpent += o.gross;
-    });
-
-    customers = Object.values(map);
-}
-let editingCustomerId = null;
-
-function editCustomer(id) {
-    const c = customers.find(x => x.id === id);
-    if (!c) return;
-
-    const name = prompt("Name:", c.name);
-    if (name === null) return;
-
-    const phone = prompt("Phone:", c.phone);
-    const email = prompt("Email:", c.email || "");
-    const address = prompt("Address:", c.address || "");
-    const notes = prompt("Notes:", c.notes || "");
-
-    c.name = name;
-    c.phone = phone;
-    c.email = email;
-    c.address = address;
-    c.notes = notes;
-
-    // Update orders too
-    orders.forEach(o => {
-        if (o.customerId === id) {
-            o.customerName = name;
-            o.phone = phone;
-            o.email = email;
-            o.address = address;
-            o.notes = notes;
-        }
-    });
-
-    renderCustomers();
-    renderOrders();
-    saveToGoogleSheets();
-}
-function deleteCustomer(id) {
-    if (!confirm("Delete customer and ALL their orders?")) return;
-
-    orders = orders.filter(o => o.customerId !== id);
-    recalcCustomersFromOrders();
-    renderOrders();
-    renderCustomers();
-    saveToGoogleSheets();
-}
-function openCustomerPopup(id) {
-    const customer = customers.find(c => c.id === id);
-    if (!customer) return;
-
-    document.getElementById("popupCustomerName").textContent = customer.name;
-    document.getElementById("popupTotal").textContent = (customer.totalSpent || 0).toFixed(2);
-
-    const tbody = document.getElementById("popupOrdersBody");
-    const rows = orders.filter(o => o.customerId === id);
-
-    tbody.innerHTML = rows.map(o => `
-        <tr>
-            <td>${o.date || '-'}</td>
-            <td>${(o.products || []).map(p => `${p.name} × ${p.qty}`).join('<br>')}</td>
-            <td>৳${o.gross.toFixed(2)}</td>
-            <td>
-                <button class="btn btn-danger action-btn" onclick="deleteOrder(${o.id}); openCustomerPopup(${id})">
-                    Delete
-                </button>
-            </td>
-        </tr>
-    `).join('');
-
-    document.getElementById("customerPopup").style.display = "flex";
-}
-
-function closeCustomerPopup() {
-    document.getElementById("customerPopup").style.display = "none";
-}
 
     </script>
-    <div id="customerPopup" class="modal" style="display:none;">
-    <div class="modal-content" style="max-width:800px;">
-        <span class="close" onclick="closeCustomerPopup()">&times;</span>
-        <h2 id="popupCustomerName"></h2>
-        <p><strong>Total Spent:</strong> ৳<span id="popupTotal"></span></p>
-
-        <table width="100%">
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Items</th>
-                    <th>Total</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="popupOrdersBody"></tbody>
-        </table>
-    </div>
-</div>
-
 </body>
 </html>
-
