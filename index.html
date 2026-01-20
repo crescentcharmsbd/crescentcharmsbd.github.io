@@ -320,6 +320,10 @@
                 box-shadow: none;
             }
         }
+        .category-row td {
+    border-top: 2px solid #ddd;
+}
+
     </style>
 </head>
 <body>
@@ -385,6 +389,10 @@
             <div style="margin-top: 40px;">
                 <input type="text" id="searchInventory" placeholder="🔍 Search inventory..." onkeyup="renderInventory()" style="width: 100%;">
             </div>
+            <select id="categoryFilter" onchange="renderInventory()" class="form-control">
+    <option value="">All Categories</option>
+</select>
+
             
             <table id="inventoryTable">
                 <thead>
@@ -576,7 +584,10 @@
             document.getElementById(section).classList.add('active');
             event.target.classList.add('active');
             
-            if (section === 'inventory') renderInventory();
+if (section === 'inventory') {
+    populateCategoryFilter();
+    renderInventory();
+}
             if (section === 'orders') {
                 renderOrders();
                 updateCustomerDropdown();
@@ -625,7 +636,7 @@
                     photo
                 });
             }
-            
+            populateCategoryFilter();
             renderInventory();
             saveToGoogleSheets();
             
@@ -666,37 +677,80 @@
             document.getElementById('cancelItemBtn').style.display = 'none';
         }
         
-        function renderInventory() {
-            const search = document.getElementById('searchInventory')?.value.toLowerCase() || '';
-            const filtered = inventory.filter(i => 
-                i.name.toLowerCase().includes(search) || 
-                i.category.toLowerCase().includes(search)
-            );
-            
-            const tbody = document.getElementById('inventoryBody');
-            tbody.innerHTML = filtered.map(item => {
-                const margin = item.price - item.cost;
-                const marginPercent = ((margin / item.cost) * 100).toFixed(1);
-                return `
-                    <tr>
-                        <td><img src="${item.photo || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/></svg>'}" class="item-image" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/></svg>'"></td>
-                        <td><span class="category-badge">${item.category}</span></td>
-                        <td><strong>${item.name}</strong></td>
-                        <td>৳${item.cost.toFixed(2)}</td>
-                        <td>৳${item.price.toFixed(2)}</td>
-                        <td class="${margin >= 0 ? 'profit-positive' : 'profit-negative'}">৳${margin.toFixed(2)} (${marginPercent}%)</td>
-                        <td>
-                            <button class="btn btn-danger action-btn" onclick="deleteItem(${item.id})">Delete</button>
-                            <button class="btn btn-info action-btn" onclick="editItem(${item.id})">Edit</button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+function renderInventory() {
+const search = document.getElementById('searchInventory')?.value.toLowerCase() || '';
+const selectedCategory = document.getElementById('categoryFilter')?.value || '';
+
+let filtered = inventory.filter(i => {
+    const matchSearch =
+        i.name.toLowerCase().includes(search) ||
+        i.category.toLowerCase().includes(search);
+
+    const matchCategory = !selectedCategory || i.category === selectedCategory;
+
+    return matchSearch && matchCategory;
+});
+
+
+    // ✅ Sort by category then name
+    filtered.sort((a, b) => {
+        const catA = (a.category || 'Other').toLowerCase();
+        const catB = (b.category || 'Other').toLowerCase();
+
+        if (catA !== catB) return catA.localeCompare(catB);
+        return a.name.localeCompare(b.name);
+    });
+
+    const tbody = document.getElementById('inventoryBody');
+    let html = '';
+    let lastCategory = null;
+
+    filtered.forEach(item => {
+        const margin = item.price - item.cost;
+        const marginPercent = ((margin / item.cost) * 100).toFixed(1);
+
+        // ✅ Category header row
+        if (item.category !== lastCategory) {
+            lastCategory = item.category;
+            html += `
+                <tr class="category-row">
+                    <td colspan="7" style="background:#f5f7fa;font-weight:bold;color:#0f3460;">
+                        📁 ${item.category || 'Other'}
+                    </td>
+                </tr>
+            `;
         }
+
+        html += `
+            <tr>
+                <td>
+                    <img src="${item.photo || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/></svg>'}"
+                         class="item-image"
+                         onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23ddd%22 width=%2260%22 height=%2260%22/></svg>'">
+                </td>
+                <td><span class="category-badge">${item.category}</span></td>
+                <td><strong>${item.name}</strong></td>
+                <td>৳${item.cost.toFixed(2)}</td>
+                <td>৳${item.price.toFixed(2)}</td>
+                <td class="${margin >= 0 ? 'profit-positive' : 'profit-negative'}">
+                    ৳${margin.toFixed(2)} (${marginPercent}%)
+                </td>
+                <td>
+                    <button class="btn btn-danger action-btn" onclick="deleteItem(${item.id})">Delete</button>
+                    <button class="btn btn-info action-btn" onclick="editItem(${item.id})">Edit</button>
+                </td>
+            </tr>
+        `;
+    });
+
+    tbody.innerHTML = html;
+}
+
         
         function deleteItem(id) {
             if (confirm('Delete this item?')) {
                 inventory = inventory.filter(i => i.id !== id);
+                populateCategoryFilter();
                 renderInventory();
                 saveToGoogleSheets();
             }
@@ -1224,6 +1278,23 @@ function updateProductDropdown() {
                 closeInvoice();
             }
         }
+
+        function populateCategoryFilter() {
+    const select = document.getElementById('categoryFilter');
+    if (!select) return;
+
+    const categories = [...new Set(inventory.map(i => i.category || 'Other'))].sort();
+
+    select.innerHTML = '<option value="">All Categories</option>';
+
+    categories.forEach(cat => {
+        const opt = document.createElement('option');
+        opt.value = cat;
+        opt.textContent = cat;
+        select.appendChild(opt);
+    });
+}
+
     </script>
 </body>
 </html>
