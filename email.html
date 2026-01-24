@@ -493,7 +493,7 @@ const totalWithDelivery = parseFloat(currentOrder.gross) + deliveryFee;
                             
                             <p>Hello <span class="highlight">${order.customerName}</span>,</p>
                             
-                            <p>Thank you for your order from <span class="highlight">CrescentCharmsB D</span>! 💖</p>
+                            <p>Thank you for your order from <span class="highlight">CrescentCharmsBD</span>! 💖</p>
                             
                             <div class="order-details">
                                 <p><strong>Order ID:</strong> ${order.tracking}</p>
@@ -634,7 +634,7 @@ const totalWithDelivery = parseFloat(currentOrder.gross) + deliveryFee;
                             
                             <p>Hello <span class="highlight">${order.customerName}</span>,</p>
                             
-                            <p>We hope you're loving your new jewelry from <span class="highlight">CrescentCharmsB D</span> 🌙💖  
+                            <p>We hope you're loving your new jewelry from <span class="highlight">CrescentCharmsBD</span> 🌙💖  
                             Your opinion means the world to us!</p>
                             
                             ${document.getElementById('feedbackLink')?.value ? 
@@ -679,37 +679,93 @@ const totalWithDelivery = parseFloat(currentOrder.gross) + deliveryFee;
             document.getElementById('emailPreview').scrollIntoView({ behavior: 'smooth' });
         }
         
-function sendEmail() {
-    const email = document.getElementById('customerEmail').value.trim();
-    if (!email) {
-        alert('❌ Please enter customer email!');
-        return;
-    }
-    if (!currentOrder) {
-        alert('❌ Please enter a valid tracking number!');
-        return;
-    }
-    if (!selectedTemplate) {
-        alert('❌ Please select an email template!');
-        return;
-    }
-
-    // Generate email content for body
-    const emailHTML = generateEmailHTML(selectedTemplate, currentOrder);
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = emailHTML;
-    const emailText = tempDiv.innerText || tempDiv.textContent;
-
-    const subject = selectedTemplate === 'confirmation' ? 'Order Confirmation' :
-                    selectedTemplate === 'shipped' ? 'Order Shipped' :
-                    selectedTemplate === 'refund' ? 'Refund Processed' :
-                    selectedTemplate === 'feedback' ? 'We’d Love Your Feedback!' : 'Crescent Charms BD';
-
-    // Open Gmail compose with prefilled To, Subject, Body
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailText)}`;
-    window.open(gmailUrl, '_blank');
-}
-
+        // Send email (simulated)
+        async function sendEmail() {
+            const email = document.getElementById('customerEmail').value.trim();
+            const gmailAddress = document.getElementById('gmailAddress').value.trim();
+            const gmailPassword = document.getElementById('gmailPassword').value.trim();
+            
+            if (!email) {
+                alert('❌ Please enter customer email!');
+                return;
+            }
+            
+            if (!currentOrder) {
+                alert('❌ Please enter a valid tracking number!');
+                return;
+            }
+            
+            if (!selectedTemplate) {
+                alert('❌ Please select an email template!');
+                return;
+            }
+            
+            if (!gmailAddress || !gmailPassword) {
+                alert('❌ Please configure your Gmail credentials first!');
+                return;
+            }
+            
+            const emailHTML = generateEmailHTML(selectedTemplate, currentOrder);
+            
+            // Prepare email data
+            const emailData = {
+                from: gmailAddress,
+                to: email,
+                subject: getEmailSubject(selectedTemplate, currentOrder.tracking),
+                html: emailHTML,
+                auth: {
+                    user: gmailAddress,
+                    pass: gmailPassword
+                }
+            };
+            
+            // In a real application, this would call a backend API to send via SMTP
+            // For demo purposes, we'll show instructions
+            
+            const confirmed = confirm(
+                `📧 Ready to send email!\n\n` +
+                `From: ${gmailAddress}\n` +
+                `To: ${email}\n` +
+                `Subject: ${emailData.subject}\n\n` +
+                `⚠️ Note: Direct SMTP from browser is not supported for security.\n\n` +
+                `OPTIONS:\n` +
+                `1. Copy HTML and paste in Gmail (Click OK)\n` +
+                `2. Set up a backend server for automatic sending\n\n` +
+                `Click OK to copy email HTML to clipboard.`
+            );
+            
+            if (confirmed) {
+                navigator.clipboard.writeText(emailHTML).then(() => {
+                    document.getElementById('successMessage').innerHTML = `
+                        <strong>✅ Email HTML Copied!</strong>
+                        <p>Now:</p>
+                        <ol style="margin: 10px 0 0 20px;">
+                            <li>Open Gmail → Compose</li>
+                            <li>Click ⋮ (More options) → Show original</li>
+                            <li>Paste the HTML</li>
+                            <li>Send to: <strong>${email}</strong></li>
+                        </ol>
+                        <p style="margin-top: 10px;"><strong>Subject:</strong> ${emailData.subject}</p>
+                    `;
+                    document.getElementById('successMessage').style.display = 'block';
+                    
+                    setTimeout(() => {
+                        document.getElementById('successMessage').style.display = 'none';
+                    }, 15000);
+                });
+            }
+        }
+        
+        // Get email subject based on template
+        function getEmailSubject(template, tracking) {
+            const subjects = {
+                confirmation: `✅ Order Confirmed - ${tracking} | Crescent Charms BD`,
+                shipped: `✈️ Your Order Has Shipped - ${tracking} | Crescent Charms BD`,
+                refund: `💰 Refund Processed - ${tracking} | Crescent Charms BD`,
+                feedback: `💖 We'd Love Your Feedback! | Crescent Charms BD`
+            };
+            return subjects[template] || `Update for Order ${tracking}`;
+        }
         
         // Initialize
         window.addEventListener('load', loadOrders);
