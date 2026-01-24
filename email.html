@@ -171,13 +171,7 @@
             margin-bottom: 30px;
         }
         
-        .info-box {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 5px solid #2196f3;
-            padding: 20px;
-            border-radius: 10px;
-            margin-bottom: 25px;
-        }
+
         
         .success-message {
             background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
@@ -203,20 +197,14 @@
         
         <div class="content">
             <div class="info-box">
-                <strong>📧 Gmail SMTP Setup:</strong> Configure your Gmail credentials below for automatic email sending.
             </div>
             
             <!-- Gmail SMTP Configuration -->
             <div class="section">
-                <h2 style="color: #2c3e50; margin-bottom: 20px;">⚙️ Gmail Configuration</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Your Gmail Address</label>
-                        <input type="email" id="gmailAddress" placeholder="your-email@gmail.com" value="crescentcharmsbd@gmail.com">
                     </div>
                     <div class="form-group">
-                        <label>Gmail App Password</label>
-                        <input type="password" id="gmailPassword" placeholder="xxxx xxxx xxxx xxxx">
                     </div>
                 </div>
             </div>
@@ -682,8 +670,6 @@ const totalWithDelivery = parseFloat(currentOrder.gross) + deliveryFee;
         // Send email (simulated)
         async function sendEmail() {
             const email = document.getElementById('customerEmail').value.trim();
-            const gmailAddress = document.getElementById('gmailAddress').value.trim();
-            const gmailPassword = document.getElementById('gmailPassword').value.trim();
             
             if (!email) {
                 alert('❌ Please enter customer email!');
@@ -699,24 +685,16 @@ const totalWithDelivery = parseFloat(currentOrder.gross) + deliveryFee;
                 alert('❌ Please select an email template!');
                 return;
             }
-            
-            if (!gmailAddress || !gmailPassword) {
-                alert('❌ Please configure your Gmail credentials first!');
-                return;
-            }
+    
             
             const emailHTML = generateEmailHTML(selectedTemplate, currentOrder);
             
             // Prepare email data
             const emailData = {
-                from: gmailAddress,
+                from: "crescentcharmsbd@gmail.com",
                 to: email,
                 subject: getEmailSubject(selectedTemplate, currentOrder.tracking),
                 html: emailHTML,
-                auth: {
-                    user: gmailAddress,
-                    pass: gmailPassword
-                }
             };
             
             // In a real application, this would call a backend API to send via SMTP
@@ -724,13 +702,9 @@ const totalWithDelivery = parseFloat(currentOrder.gross) + deliveryFee;
             
             const confirmed = confirm(
                 `📧 Ready to send email!\n\n` +
-                `From: ${gmailAddress}\n` +
+                `From: "crescentcharmsbd@gmail.com"\n` +
                 `To: ${email}\n` +
                 `Subject: ${emailData.subject}\n\n` +
-                `⚠️ Note: Direct SMTP from browser is not supported for security.\n\n` +
-                `OPTIONS:\n` +
-                `1. Copy HTML and paste in Gmail (Click OK)\n` +
-                `2. Set up a backend server for automatic sending\n\n` +
                 `Click OK to copy email HTML to clipboard.`
             );
             
