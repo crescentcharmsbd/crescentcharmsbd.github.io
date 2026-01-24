@@ -398,6 +398,17 @@
             <button class="nav-btn" onclick="showSection('orders')">📋 Orders</button>
             <button class="nav-btn" onclick="showSection('customers')">👥 Customers</button>
             <button class="nav-btn" onclick="showSection('invoices')">🧾 Invoices</button>
+<button class="nav-btn" 
+        onclick="
+            const pwd = prompt('🔒 Enter password:');
+            if(pwd === 'Crescent@@4545T') {
+                window.open('email.html', '_blank');
+            } else {
+                alert('❌ Incorrect password!');
+            }
+        ">📧 Email
+</button>
+
         </div>
         
         <!-- Inventory Section -->
