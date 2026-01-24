@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crescent Charms BD - Email System</title>
+    <link rel="icon" type="image/png" href="Crescent_Charms.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 70px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #ff69b4;
+            box-shadow: 0 0 0 3px rgba(255, 105, 180, 0.1);
+        }
+        
+        .btn {
+            padding: 14px 32px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            margin-right: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #ff69b4 0%, #ff1493 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #27ae60 0%, #229954 100%);
+            color: white;
+        }
+        
+        .email-template-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .template-card {
+            padding: 25px;
+            border: 3px solid #e0e0e0;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .template-card:hover {
+            border-color: #ff69b4;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255, 105, 180, 0.2);
+        }
+        
+        .template-card.selected {
+            border-color: #ff69b4;
+            background: linear-gradient(135deg, #fff5f9 0%, #ffe6f0 100%);
+        }
+        
+        .template-card h3 {
+            color: #ff69b4;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        .email-preview {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 30px;
+            background: #fafafa;
+            margin-top: 30px;
+        }
+        
+        .email-preview h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .preview-content {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .order-search {
+            margin-bottom: 30px;
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border-left: 5px solid #2196f3;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .success-message {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌙 Crescent Charms BD</h1>
+            <p>Email Management System</p>
+        </div>
+        
+        <div class="content">
+            <div class="info-box">
+                <strong>📧 Gmail SMTP Setup:</strong> Configure your Gmail credentials below for automatic email sending.
+            </div>
+            
+            <!-- Gmail SMTP Configuration -->
+            <div class="section">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;">⚙️ Gmail Configuration</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Your Gmail Address</label>
+                        <input type="email" id="gmailAddress" placeholder="your-email@gmail.com" value="crescentcharmsbd@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Gmail App Password</label>
+                        <input type="password" id="gmailPassword" placeholder="xxxx xxxx xxxx xxxx">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Order Lookup -->
+            <div class="section order-search">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;">🔍 Find Order</h2>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tracking Number</label>
+                        <input type="text" id="trackingNumber" placeholder="CC-XXXXX" oninput="loadOrder()">
+                    </div>
+                    <div class="form-group">
+                        <label>Customer Email</label>
+                        <input type="email" id="customerEmail" placeholder="customer@example.com">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Email Template Selection -->
+            <div class="section">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;">📨 Select Email Type</h2>
+                <div class="email-template-selector">
+                    <div class="template-card" onclick="selectTemplate('confirmation')">
+                        <div class="icon">✅</div>
+                        <h3>Order Confirmation</h3>
+                        <p>Confirm order received</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('shipped')">
+                        <div class="icon">✈️</div>
+                        <h3>Order Shipped</h3>
+                        <p>Order on the way</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('refund')">
+                        <div class="icon">💰</div>
+                        <h3>Refund/Cancelled</h3>
+                        <p>Process refund</p>
+                    </div>
+                    <div class="template-card" onclick="selectTemplate('feedback')">
+                        <div class="icon">✍️</div>
+                        <h3>Feedback Request</h3>
+                        <p>Ask for review</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Additional Fields -->
+            <div class="section" id="additionalFields" style="display: none;">
+                <h2 style="color: #2c3e50; margin-bottom: 20px;">📝 Additional Information</h2>
+                <div id="extraFieldsContainer"></div>
+            </div>
+            
+            <!-- Preview & Send -->
+            <div class="section">
+                <button class="btn btn-primary" onclick="previewEmail()" style="font-size: 18px;">
+                    👁️ Preview Email
+                </button>
+                <button class="btn btn-success" onclick="sendEmail()" style="font-size: 18px;">
+                    📤 Send Email
+                </button>
+            </div>
+            
+            <div class="email-preview" id="emailPreview" style="display: none;">
+                <h3>📧 Email Preview</h3>
+                <div class="preview-content" id="previewContent"></div>
+            </div>
+            
+            <div class="success-message" id="successMessage">
+                <strong>✅ Email Sent Successfully!</strong>
+                <p>The email has been sent to the customer.</p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Configuration
+        const SHEET_ID = '1jU07VA_IKBi50rg_mHahr0rUxfUYpure8JCYY9jBYx0';
+        const API_KEY = 'AIzaSyDsB7LyUHBbsF--oTUI_b6KeGM2xGCVIAc';
+        
+        let currentOrder = null;
+        let selectedTemplate = null;
+        let orders = [];
+        
+        // Set delivery fee when button clicked
+function setDeliveryFee(amount) {
+    const deliveryInput = document.getElementById('deliveryFee');
+    if (!deliveryInput) return;
+    deliveryInput.value = amount;
+    updateTotalWithDelivery();
+}
+
+function updateTotalWithDelivery() {
+    const deliveryInput = document.getElementById('deliveryFee');
+    const orderTotalInput = document.getElementById('orderTotal');
+
+    if (!deliveryInput || !orderTotalInput) return;
+    if (!currentOrder || !currentOrder.gross) {
+        orderTotalInput.value = '';
+        return;
+    }
+
+    const deliveryFee = parseFloat(deliveryInput.value) || 0;
+    const productTotal = parseFloat(currentOrder.gross) || 0;
+
+    orderTotalInput.value = (productTotal + deliveryFee).toFixed(2);
+}
+
+// Listen for manual input
+document.addEventListener('input', function(e) {
+    if (e.target && e.target.id === 'deliveryFee') {
+        updateTotalWithDelivery();
+    }
+});
+
+
+
+        // Load orders from Google Sheets
+        async function loadOrders() {
+            try {
+                const response = await fetch(
+                    `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Orders?key=${API_KEY}`
+                );
+                const data = await response.json();
+                
+                if (data.values && data.values.length > 1) {
+                    orders = data.values.slice(1).map(row => ({
+                        id: parseInt(row[0]) || 0,
+                        tracking: row[1] || '',
+                        customerId: parseInt(row[2]) || 0,
+                        customerName: row[3] || '',
+                        phone: row[4] || '',
+                        email: row[5] || '',
+                        address: row[6] || '',
+                        notes: row[7] || '',
+                        products: row[8] ? JSON.parse(row[8]) : [],
+                        cost: parseFloat(row[9]) || 0,
+                        gross: parseFloat(row[10]) || 0,
+                        profit: parseFloat(row[11]) || 0,
+                        status: row[12] || 'pending',
+                        date: row[13] || ''
+                    }));
+                }
+            } catch (error) {
+                console.error('Error loading orders:', error);
+            }
+        }
+        
+        // Load order by tracking number
+        function loadOrder() {
+            const tracking = document.getElementById('trackingNumber').value.trim().toUpperCase();
+            if (!tracking) return;
+            
+            currentOrder = orders.find(o => o.tracking.toUpperCase() === tracking);
+            
+            if (currentOrder) {
+                document.getElementById('customerEmail').value = currentOrder.email || '';
+            }
+        }
+        
+        // Select email template
+        function selectTemplate(type) {
+            selectedTemplate = type;
+            
+            // Update UI
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            event.target.closest('.template-card').classList.add('selected');
+            
+            // Show additional fields if needed
+            const fieldsContainer = document.getElementById('extraFieldsContainer');
+            const fieldsSection = document.getElementById('additionalFields');
+            
+            fieldsContainer.innerHTML = '';
+            
+            if (type === 'shipped') {
+                fieldsSection.style.display = 'block';
+                fieldsContainer.innerHTML = `
+                    <div class="form-group">
+                        <label>Courier/Tracking Link</label>
+                        <input type="url" id="trackingLink" placeholder="https://tracking-link.com">
+                    </div>
+            <label>Delivery Fee (BDT)</label>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn" onclick="setDeliveryFee(80)" style="flex: 1; background: #e3f2fd; color: #1976d2;">৳80 Inside Dhaka</button>
+                <button class="btn" onclick="setDeliveryFee(120)" style="flex: 1; background: #fff3e0; color: #f57c00;">৳120 Outside Dhaka</button>
+            </div>
+            <input type="number" id="deliveryFee" placeholder="Or enter custom amount" style="margin-top: 10px;" oninput="updateTotalWithDelivery()">
+        </div>
+        <div class="form-group">
+            <label>Order Total (Including Delivery)</label>
+            <input type="number" id="orderTotal" readonly style="background: #f0f0f0; font-weight: bold; font-size: 18px;">
+        </div>
+                `;
+                    updateTotalWithDelivery();
+            } else if (type === 'refund') {
+                fieldsSection.style.display = 'block';
+                fieldsContainer.innerHTML = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Refund Amount (BDT)</label>
+                            <input type="number" id="refundAmount" placeholder="Amount">
+                        </div>
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <input type="text" id="paymentMethod" placeholder="bKash/Bank Transfer">
+                        </div>
+                    </div>
+                `;
+            } else if (type === 'feedback') {
+                fieldsSection.style.display = 'block';
+                fieldsContainer.innerHTML = `
+                    <div class="form-group">
+                        <label>Feedback/Review Link</label>
+                        <input type="url" id="feedbackLink" placeholder="https://your-review-link.com">
+                    </div>
+                `;
+            } else if (type === 'confirmation') {
+    fieldsSection.style.display = 'block';
+    fieldsContainer.innerHTML = `
+        <div class="form-group">
+            <label>Delivery Fee (BDT)</label>
+            <div style="display: flex; gap: 10px; margin-top: 10px;">
+                <button class="btn" onclick="setDeliveryFee(80)" style="flex: 1; background: #e3f2fd; color: #1976d2;">৳80 Inside Dhaka</button>
+                <button class="btn" onclick="setDeliveryFee(120)" style="flex: 1; background: #fff3e0; color: #f57c00;">৳120 Outside Dhaka</button>
+            </div>
+            <input type="number" id="deliveryFee" placeholder="Or enter custom amount" style="margin-top: 10px;" oninput="updateTotalWithDelivery()">
+        </div>
+        <div class="form-group">
+            <label>Order Total (Including Delivery)</label>
+            <input type="number" id="orderTotal" readonly style="background: #f0f0f0; font-weight: bold; font-size: 18px;">
+        </div>
+    `;
+
+    // Wait a tiny bit for the DOM to render, then update total
+    setTimeout(updateTotalWithDelivery, 0);
+}
+ else {
+                fieldsSection.style.display = 'none';
+            }
+        }
+        
+        // Generate email templates
+        function generateEmailHTML(type, order) {
+            const productsList = order.products.map(p => 
+                `${p.name} (Qty: ${p.quantity}) - ৳${(p.price * p.quantity).toFixed(2)}`
+            ).join('<br>');
+            
+// Get delivery fee from input
+const deliveryFee = parseFloat(document.getElementById('deliveryFee')?.value) || 0;
+const totalWithDelivery = parseFloat(currentOrder.gross) + deliveryFee;
+
+
+            const templates = {
+                confirmation: `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Order Confirmation - CrescentCharmsB D</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff8f5; color: #333; margin: 0; padding: 0;}
+                            .container { width: 90%; max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 30px;}
+                            h1 { color: #ff69b4; font-size: 24px; margin-bottom: 10px;}
+                            p { line-height: 1.6; margin: 5px 0;}
+                            .order-details { background-color: #fff0f6; border-radius: 10px; padding: 15px; margin: 15px 0;}
+                            .footer { font-size: 14px; color: #777; text-align: center; margin-top: 20px;}
+                            .highlight { color: #ff69b4; font-weight: bold;}
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>🎉 Order Confirmed! 🌙💖</h1>
+                            
+                            <p>Hello <span class="highlight">${order.customerName}</span>,</p>
+                            
+                            <p>Thank you for your order from <span class="highlight">CrescentCharmsB D</span>! 💖</p>
+                            
+                            <div class="order-details">
+                                <p><strong>Order ID:</strong> ${order.tracking}</p>
+                                <p><strong>Products:</strong><br>${productsList}</p>
+                                <p><strong>Total Amount:</strong> ৳${order.gross.toFixed(2)}</p>
+                                <p><strong>With Delivery :</strong> ৳${totalWithDelivery.toFixed(2)}(${totalWithDelivery.toFixed(2) - order.gross.toFixed(2)}Tk)</p>
+
+                                <p><strong>Delivery Address:</strong> ${order.address}</p>
+                            </div>
+                            
+                            <p>We're preparing your order with love 💙✨ and will notify you once it ships!</p>
+                            
+                            <p>Questions? Reply to: <a href="mailto:crescentcharmsbd@gmail.com">crescentcharmsbd@gmail.com</a></p>
+                            
+                            <div class="footer">
+                                <p>With love,</p>
+                                <p>The CrescentCharmsBD Team</p>
+                                <p>Based in Dhanmondi, Dhaka, Bangladesh</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `,
+                
+                shipped: `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Your Order Has Shipped - CrescentCharmsB D</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff8f5; color: #333; margin: 0; padding: 0;}
+                            .container { width: 90%; max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 30px;}
+                            h1 { color: #ff69b4; font-size: 24px; margin-bottom: 10px;}
+                            p { line-height: 1.6; margin: 5px 0;}
+                            .order-details { background-color: #fff0f6; border-radius: 10px; padding: 15px; margin: 15px 0;}
+                            .footer { font-size: 14px; color: #777; text-align: center; margin-top: 20px;}
+                            .highlight { color: #ff69b4; font-weight: bold;}
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>🎉 Your CrescentCharmsB D Order is On the Way! 🌙💖</h1>
+                            
+                            <p>Hello <span class="highlight">${order.customerName}</span>,</p>
+                            
+                            <p>Good news! Your order has been shipped and is on its way to you! ✈️</p>
+                            
+                            <div class="order-details">
+                                <p><strong>Order ID:</strong> ${order.tracking}</p>
+                                <p><strong>Products:</strong><br>${productsList}</p>
+                                <p><strong>Total Amount:</strong> ৳${order.gross.toFixed(2)}</p>
+                                <p><strong>With Delivery :</strong> ৳${totalWithDelivery.toFixed(2)}(${totalWithDelivery.toFixed(2) - order.gross.toFixed(2)}Tk)</p>
+                                ${document.getElementById('trackingLink')?.value ? 
+                                    `<p><strong>Track Your Order:</strong> <a href="${document.getElementById('trackingLink').value}">Click here</a></p>` : ''}
+                            </div>
+                            
+                            <p>We packed your order with love 💙✨ and can't wait for you to receive it!</p>
+                            
+                            <p>Questions? Reply to: <a href="mailto:crescentcharmsbd@gmail.com">crescentcharmsbd@gmail.com</a></p>
+                            
+                            <div class="footer">
+                                <p>With love,</p>
+                                <p>The CrescentCharmsBD Team</p>
+                                <p>Based in Dhanmondi, Dhaka, Bangladesh</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `,
+                
+                refund: `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>Refund Processed - CrescentCharmsB D</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff8f5; color: #333; margin: 0; padding: 0;}
+                            .container { width: 90%; max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 30px;}
+                            h1 { color: #ff69b4; font-size: 24px; margin-bottom: 10px;}
+                            p { line-height: 1.6; margin: 5px 0;}
+                            .order-details { background-color: #fff0f6; border-radius: 10px; padding: 15px; margin: 15px 0;}
+                            .footer { font-size: 14px; color: #777; text-align: center; margin-top: 20px;}
+                            .highlight { color: #ff69b4; font-weight: bold;}
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>💌 Your Refund Has Been Processed</h1>
+                            
+                            <p>Hello <span class="highlight">${order.customerName}</span>,</p>
+                            
+                            <p>We've processed your refund for order <span class="highlight">${order.tracking}</span> 💖</p>
+                            
+                            <div class="order-details">
+                                <p><strong>Order ID:</strong> ${order.tracking}</p>
+                                <p><strong>Products:</strong><br>${productsList}</p>
+                                <p><strong>Amount Refunded:</strong> ৳${document.getElementById('refundAmount')?.value || order.gross.toFixed(2)}</p>
+                                <p><strong>Payment Method:</strong> ${document.getElementById('paymentMethod')?.value || 'Original Payment Method'}</p>
+                            </div>
+                            
+                            <p>The refunded amount should reflect in your account within 3-5 business days.</p>
+                            
+                            <p>Questions? Reply to: <a href="mailto:crescentcharmsbd@gmail.com">crescentcharmsbd@gmail.com</a></p>
+                            
+                            <p>We hope to serve you again soon! 💙</p>
+                            
+                            <div class="footer">
+                                <p>With love,</p>
+                                <p>The CrescentCharmsBD Team</p>
+                                <p>Based in Dhanmondi, Dhaka, Bangladesh</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `,
+                
+                feedback: `
+                    <!DOCTYPE html>
+                    <html lang="en">
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>We'd Love Your Feedback! - CrescentCharmsB D</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #fff8f5; color: #333; margin: 0; padding: 0;}
+                            .container { width: 90%; max-width: 600px; margin: 20px auto; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); padding: 30px;}
+                            h1 { color: #ff69b4; font-size: 24px; margin-bottom: 10px;}
+                            p { line-height: 1.6; margin: 5px 0;}
+                            .button { display: inline-block; padding: 12px 20px; margin: 15px 0; background-color: #ff69b4; color: #fff; text-decoration: none; border-radius: 8px;}
+                            .footer { font-size: 14px; color: #777; text-align: center; margin-top: 20px;}
+                            .highlight { color: #ff69b4; font-weight: bold;}
+                        </style>
+                    </head>
+                    <body>
+                        <div class="container">
+                            <h1>💖 Share Your Thoughts!</h1>
+                            
+                            <p>Hello <span class="highlight">${order.customerName}</span>,</p>
+                            
+                            <p>We hope you're loving your new jewelry from <span class="highlight">CrescentCharmsB D</span> 🌙💖  
+                            Your opinion means the world to us!</p>
+                            
+                            ${document.getElementById('feedbackLink')?.value ? 
+                                `<a href="${document.getElementById('feedbackLink').value}" class="button">Leave Feedback</a>` : 
+                                '<p style="background: #fff0f6; padding: 10px; border-radius: 5px;">Please provide a feedback link to enable the button.</p>'}
+                            
+                            <p>Every review helps us craft better pieces, just for you! ✨</p>
+                            
+                            <p>Thank you for being part of our CrescentCharmsB D family 💙</p>
+                            
+                            <div class="footer">
+                                <p>With love,</p>
+                                <p>The CrescentCharmsBD Team</p>
+                                <p>Based in Dhanmondi, Dhaka, Bangladesh</p>
+                            </div>
+                        </div>
+                    </body>
+                    </html>
+                `
+            };
+            
+            return templates[type] || '';
+        }
+        
+        // Preview email
+        function previewEmail() {
+            if (!currentOrder) {
+                alert('❌ Please enter a valid tracking number first!');
+                return;
+            }
+            
+            if (!selectedTemplate) {
+                alert('❌ Please select an email template!');
+                return;
+            }
+            
+            const emailHTML = generateEmailHTML(selectedTemplate, currentOrder);
+            document.getElementById('previewContent').innerHTML = emailHTML;
+            document.getElementById('emailPreview').style.display = 'block';
+            
+            // Scroll to preview
+            document.getElementById('emailPreview').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+function sendEmail() {
+    const email = document.getElementById('customerEmail').value.trim();
+    if (!email) {
+        alert('❌ Please enter customer email!');
+        return;
+    }
+    if (!currentOrder) {
+        alert('❌ Please enter a valid tracking number!');
+        return;
+    }
+    if (!selectedTemplate) {
+        alert('❌ Please select an email template!');
+        return;
+    }
+
+    // Generate email content for body
+    const emailHTML = generateEmailHTML(selectedTemplate, currentOrder);
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = emailHTML;
+    const emailText = tempDiv.innerText || tempDiv.textContent;
+
+    const subject = selectedTemplate === 'confirmation' ? 'Order Confirmation' :
+                    selectedTemplate === 'shipped' ? 'Order Shipped' :
+                    selectedTemplate === 'refund' ? 'Refund Processed' :
+                    selectedTemplate === 'feedback' ? 'We’d Love Your Feedback!' : 'Crescent Charms BD';
+
+    // Open Gmail compose with prefilled To, Subject, Body
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailText)}`;
+    window.open(gmailUrl, '_blank');
+}
+
+        
+        // Initialize
+        window.addEventListener('load', loadOrders);
+    </script>
+</body>
+</html>
