@@ -1,0 +1,1028 @@
+/* =========================
+   1. VARIABLES & RESET
+   ========================= */
+:root {
+  --rose: #E6A4B4;
+  --ivory: #FFF8F3;
+  --black: #1E1E1E;
+  --gold: #C9A24D;
+  --hover-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+}
+.hamburger-close {
+  display: none;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+}
+
+body {
+  background: var(--ivory);
+  color: var(--black);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* =========================
+   2. HEADER & NAV
+   ========================= */
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 60px;
+  background: white;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+header img {
+  height: 50px;
+}
+
+nav a {
+  margin: 0 18px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+nav a:hover {
+  color: var(--rose);
+}
+
+/* Hamburger (Hidden on Desktop) */
+.hamburger {
+  display: none;
+  font-size: 28px;
+  background: var(--rose);
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.hamburger:hover {
+  transform: scale(1.1);
+  box-shadow: var(--hover-shadow);
+}
+
+/* =========================
+   3. MINI CART (Fixed Floating)
+   ========================= */
+.mini-cart {
+  position: fixed;
+  top: 90px; /* Pushed below navbar height */
+  right: 25px;
+  z-index: 1100; /* Higher than navbar */
+  cursor: pointer;
+}
+
+.cart-icon {
+  background: var(--rose);
+  color: white;
+  padding: 14px;
+  border-radius: 50%;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--hover-shadow);
+  transition: 0.3s;
+}
+
+.cart-icon:hover {
+  transform: scale(1.05);
+}
+
+/* Dropdown Container */
+.mini-cart-dropdown {
+  display: none; /* Hidden by default */
+  position: absolute;
+  right: 0;
+  top: 100%; /* Directly below icon */
+  margin-top: 10px;
+  width: 320px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Hover Mechanism: Show dropdown when hovering parent .mini-cart */
+.mini-cart:hover .mini-cart-dropdown {
+  display: block;
+}
+
+/* Mini Cart Items */
+.mini-cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.mini-cart-item:last-child {
+  border-bottom: none;
+}
+
+.mini-cart-item img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 10px;
+}
+
+.mini-cart-total {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 2px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  color: var(--black);
+}
+
+/* =========================
+   4. HERO SECTION
+   ========================= */
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 80px 60px;
+  gap: 40px;
+  align-items: center;
+}
+
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 60px;
+  color: var(--black);
+  background: linear-gradient(90deg, #E6A4B4, #C9A24D);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero p {
+  margin: 25px 0;
+  font-size: 20px;
+  color: #555;
+  max-width: 480px;
+}
+
+.hero .btn {
+  background: var(--rose);
+  color: white;
+  padding: 16px 32px;
+  border-radius: 50px;
+  text-decoration: none;
+  display: inline-block;
+  font-weight: 600;
+  transition: 0.3s;
+  box-shadow: 0 6px 15px rgba(230, 164, 180, 0.3);
+}
+
+.hero .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--hover-shadow);
+}
+
+.hero img {
+  width: 100%;
+  border-radius: 30px;
+  object-fit: cover;
+  transition: 0.5s;
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+}
+
+.hero img:hover {
+  transform: scale(1.03);
+}
+
+/* =========================
+   5. LOADER (Orb Version)
+   ========================= */
+#loader {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 248, 243, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 2000;
+  overflow: hidden;
+}
+
+.loader-orb {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #E6A4B4, #C9A24D);
+  box-shadow: 0 0 30px rgba(230, 164, 180, 0.7), 0 0 60px rgba(201, 162, 77, 0.5);
+  animation: orbPulse 1.6s infinite ease-in-out;
+  margin-bottom: 20px;
+}
+
+.loader-particles span {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #E6A4B4;
+  border-radius: 50%;
+  opacity: 0.8;
+  animation: float 2s infinite ease-in-out;
+}
+
+/* Particle Positions */
+.loader-particles span:nth-child(1) { top: 20%; left: 10%; animation-delay: 0s; }
+.loader-particles span:nth-child(2) { top: 40%; left: 80%; animation-delay: 0.2s; }
+.loader-particles span:nth-child(3) { top: 70%; left: 30%; animation-delay: 0.4s; }
+.loader-particles span:nth-child(4) { top: 50%; left: 60%; animation-delay: 0.6s; }
+.loader-particles span:nth-child(5) { top: 30%; left: 50%; animation-delay: 0.8s; }
+
+/* =========================
+   6. PRODUCTS GRID & CARD
+   ========================= */
+.products {
+  padding: 60px;
+  background: linear-gradient(to right, #FFF8F3, #F3D0D7);
+}
+
+.products h2 {
+  margin-bottom: 40px;
+  font-family: 'Playfair Display', serif;
+  font-size: 36px;
+  text-align: center;
+  color: var(--black);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 30px;
+}
+
+/* Card Base */
+.card {
+  background: white;
+  border-radius: 26px;
+  padding: 15px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, .08);
+  position: relative;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(30px) scale(.96);
+  transition: 0.6s cubic-bezier(.16, 1, .3, 1);
+}
+
+.card.show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Card Glow */
+.card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 26px;
+  background: linear-gradient(120deg, #E6A4B4, #C9A24D, #E6A4B4);
+  opacity: 0;
+  z-index: -1;
+  filter: blur(12px);
+  transition: 0.5s;
+}
+
+.card:hover::before { opacity: 0.6; }
+
+.card:hover {
+  transform: translateY(-12px) scale(1.04);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, .18);
+}
+
+/* Image */
+.img-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: 22px;
+}
+
+.card img, .main-img {
+  width: 100%;
+  height: 280px;
+  object-fit: cover;
+  border-radius: 22px;
+  transition: transform .6s ease, filter .6s ease, opacity .4s ease;
+}
+
+.card:hover img {
+  transform: scale(1.12);
+  filter: brightness(1.08) saturate(1.1);
+}
+
+/* Quick Eye Icon */
+.quick-eye {
+  position: absolute;
+  bottom: 12px; right: 12px;
+  background: rgba(255, 255, 255, .85);
+  backdrop-filter: blur(8px);
+  padding: 8px 10px;
+  border-radius: 50%;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: .4s ease;
+}
+
+.card:hover .quick-eye {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card h3 {
+  margin: 15px 0 10px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+}
+
+.price {
+  color: var(--gold);
+  font-weight: 700;
+  font-size: 18px;
+  text-align: center;
+  padding: 6px 12px;
+  background: rgba(201, 162, 77, 0.1);
+  border-radius: 20px;
+  display: inline-block;
+  width: 100%;
+  margin: 0 auto 15px;
+}
+
+/* =========================
+   7. BUTTONS (Refined)
+   ========================= */
+
+/* Shared Animation & Background */
+.checkout-btn,
+.product-btn {
+  background: linear-gradient(135deg, #E6A4B4, #C9A24D);
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1;
+}
+
+/* Shimmer Effect */
+.checkout-btn::before,
+.product-btn::before {
+  content: "";
+  position: absolute;
+  top: 0; left: -150%;
+  width: 60%; height: 100%;
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, .5), transparent);
+  animation: shimmer 2.8s infinite;
+  z-index: -1;
+}
+
+/* --- Refined Compact Checkout Button --- */
+.checkout-btn {
+  padding: 10px 20px;           /* compact padding */
+  border-radius: 50px;          /* pill shape */
+  font-size: 14px;              /* smaller text */
+  letter-spacing: 0.3px;
+  display: inline-flex;         /* ensures alignment */
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 15px rgba(230,164,180,0.45);
+  white-space: nowrap;          /* prevents text wrap */
+  animation: pulse 2.2s infinite;
+}
+
+.checkout-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 12px 28px rgba(201,162,77,0.5);
+}
+
+.checkout-btn:active { transform: scale(0.95); }
+
+/* --- Product Button --- */
+.product-btn {
+  margin: 12px auto 5px;
+  padding: 10px 26px;
+  border-radius: 60px;
+  font-size: 14px;
+  letter-spacing: .3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 20px rgba(230, 164, 180, .45);
+  animation: productPulse 2.5s infinite;
+}
+
+.product-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 14px 30px rgba(201, 162, 77, .55);
+}
+
+.product-btn:active { transform: scale(.94); }
+
+/* Loading States */
+.checkout-btn.loading, .product-btn.loading {
+  pointer-events: none;
+  background: #ccc;
+  box-shadow: none;
+  animation: none;
+}
+
+.checkout-btn.loading .btn-text::after {
+  content: "...";
+  animation: dots 1.4s infinite;
+}
+
+/* =========================
+   8. CART SECTION
+   ========================= */
+.cart-section {
+  padding: 80px 60px;
+  background: linear-gradient(135deg, #FFF8F3, #F3D0D7);
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 900px;
+  margin: 0 auto 30px;
+}
+
+.cart-section h2 {
+  text-align: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  margin: 0; /* Override default margin since we use flex header now */
+}
+
+/* Clear Cart Button */
+.clear-cart-btn {
+  background: var(--rose);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 25px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.clear-cart-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--hover-shadow);
+}
+
+.cart-grid {
+  display: grid;
+  gap: 25px;
+  max-width: 900px;
+  margin: auto;
+}
+
+.cart-item {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 20px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(8px);
+  border-radius: 22px;
+  padding: 18px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+  animation: fadeUp .5s ease;
+}
+
+.cart-item img {
+  width: 110px;
+  height: 110px;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.cart-info h4 { font-size: 18px; margin-bottom: 6px; }
+.cart-info span { color: var(--gold); font-weight: 600; }
+
+.qty-box {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.qty-btn {
+  width: 30px; height: 30px;
+  border: none; border-radius: 50%;
+  background: var(--rose); color: white;
+  font-size: 18px; cursor: pointer;
+}
+
+.remove-btn {
+  background: none; border: none;
+  color: #999; cursor: pointer;
+  font-size: 18px;
+}
+
+.cart-summary {
+  margin: 50px auto 0;
+  max-width: 900px;
+  background: white;
+  border-radius: 25px;
+  padding: 25px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, .1);
+  position: sticky;
+  bottom: 20px;
+  z-index: 90;
+}
+
+/* =========================
+   9. QUICK VIEW MODAL
+   ========================= */
+.quick-view {
+  position: fixed;
+  inset: 0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  z-index: 999;
+  overflow: hidden;
+  animation: fadeIn 0.4s ease forwards;
+}
+
+.qv-box {
+  background: #fff;
+  padding: 30px;
+  border-radius: 25px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  animation: slideUp 0.5s ease forwards;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+  overflow: visible;
+}
+
+/* Floating Close Button */
+.qv-close {
+  position: absolute;
+  top: -12px; right: -12px;
+  z-index: 100;
+  font-size: 28px;
+  color: #333;
+  cursor: pointer;
+  background: #fff;
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.2);
+  transition: 0.3s;
+}
+
+.qv-close:hover {
+  background: var(--rose);
+  color: #fff;
+  transform: scale(1.2) rotate(90deg);
+}
+
+/* Image + Thumbnails */
+.qv-img-wrapper {
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.qv-img-wrapper img {
+  width: 100%;
+  border-radius: 20px;
+  transition: transform 0.5s ease;
+}
+
+.qv-thumbnails {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.qv-thumbnails img {
+  width: 50px; height: 50px;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: 0.3s;
+}
+
+.qv-thumbnails img.active {
+  border-color: var(--rose);
+  transform: scale(1.1);
+}
+
+/* Floating particles (Behind Box) */
+.qv-bg-particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.qv-bg-particles span {
+  position: absolute;
+  width: 8px; height: 8px;
+  background: var(--rose);
+  border-radius: 50%;
+  opacity: 0.7;
+  animation: float 2s infinite ease-in-out;
+}
+
+/* =========================
+   10. GLOBAL ANIMATIONS
+   ========================= */
+@keyframes orbPulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.3); opacity: 1; }
+}
+
+@keyframes float {
+  0% { transform: translateY(0) scale(0.8); opacity: 0.8; }
+  50% { transform: translateY(-15px) scale(1.2); opacity: 1; }
+  100% { transform: translateY(0) scale(0.8); opacity: 0.8; }
+}
+
+@keyframes shimmer {
+  0% { left: -150%; }
+  50%, 100% { left: 150%; }
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(230, 164, 180, 0); }
+  50% { box-shadow: 0 0 20px rgba(230, 164, 180, 0.6); }
+}
+
+@keyframes productPulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(230, 164, 180, 0); }
+  50% { box-shadow: 0 0 22px rgba(230, 164, 180, 0.6); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn { 0% { opacity: 0; } 100% { opacity: 1; } }
+@keyframes slideUp {
+  0% { transform: translateY(40px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes dots {
+  0% { content: "Processing"; }
+  33% { content: "Processing."; }
+  66% { content: "Processing.."; }
+  100% { content: "Processing..."; }
+}
+
+/* =========================
+   11. FOOTER
+   ========================= */
+footer {
+  text-align: center;
+  padding: 50px;
+  color: #777;
+  font-size: 16px;
+  background: #fff;
+}
+
+.ig {
+  position: fixed;
+  bottom: 25px; right: 25px;
+  background: #E1306C;
+  color: white;
+  padding: 16px 20px;
+  border-radius: 50%;
+  font-size: 22px;
+  text-decoration: none;
+  box-shadow: 0 6px 15px rgba(225, 48, 108, 0.3);
+  transition: 0.3s;
+  z-index: 50;
+}
+
+.ig:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--hover-shadow);
+}
+
+/* =========================
+   12. MEDIA QUERIES
+   ========================= */
+@media (max-width: 900px) {
+  /* Mobile Nav */
+  .hamburger { display: block; }
+
+  nav {
+    position: fixed;
+    top: 0; right: 0;
+    height: 100vh;
+    width: 70%;
+    background: var(--ivory);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+    z-index: 999;
+    padding: 40px 20px;
+  }
+
+  nav.show { transform: translateX(0); }
+
+  nav a {
+    display: block;
+    width: 80%;
+    text-align: center;
+    padding: 14px 0;
+    font-size: 20px;
+    font-weight: 600;
+    background: var(--rose);
+    color: white;
+    border-radius: 25px;
+    text-decoration: none;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  nav a:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--hover-shadow);
+  }
+
+  /* Hero Adjustments */
+  .hero {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+  .hero img { margin-top: 40px; }
+  .hero p { margin: 25px auto; }
+}
+
+@media (max-width: 700px) {
+  .cart-item {
+    grid-template-columns: 1fr;
+    text-align: center;
+    justify-items: center;
+  }
+  .cart-item img { margin-bottom: 10px; }
+  .cart-actions { text-align: center; margin-top: 10px; }
+}
+/* --- Staggered Entrance for Product Cards --- */
+.card {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s cubic-bezier(0.2, 1, 0.3, 1), 
+              transform 0.8s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.card.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* --- Smooth Image Swap for Hover --- */
+.main-img {
+  transition: opacity 0.4s ease-in-out, transform 0.6s ease;
+}
+
+/* --- Hero Entrance Animation --- */
+.hero-text {
+  animation: fadeLeft 1s ease forwards;
+}
+
+.hero-image {
+  animation: fadeRight 1.2s ease forwards;
+}
+
+@keyframes fadeLeft {
+  from { opacity: 0; transform: translateX(-50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes fadeRight {
+  from { opacity: 0; transform: translateX(50px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* --- Quick View Scale Pop --- */
+.quick-view {
+  transition: opacity 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+.qv-box {
+  transform: scale(0.8) translateY(20px);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.quick-view[style*="display: flex"] .qv-box {
+  transform: scale(1) translateY(0);
+}
+
+/* --- Mini Cart Dropdown Animation --- */
+.mini-cart-dropdown {
+  transform: translateY(10px);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.mini-cart:hover .mini-cart-dropdown {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+/* --- LOADER --- */
+/* --- LOADER --- */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: #121212; /* Deep obsidian background */
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.8s ease;
+}
+
+.moon-loader {
+  width: 50px; 
+  height: 50px;
+  border-radius: 50%;
+  /* Golden Moon Shade */
+  box-shadow: inset 8px 0 0 0 #C9A24D; 
+  animation: moonSpin 1.5s linear infinite;
+}
+
+.loader-logo {
+  margin-top: 20px;
+  font-family: 'Playfair Display', serif;
+  /* Applying your Golden Shade here */
+  color: #C9A24D; 
+  font-size: 1.2rem;
+  letter-spacing: 0.3rem;
+  text-transform: uppercase;
+  /* Soft entrance animation for the text */
+  animation: textFadeIn 2s ease forwards;
+}
+
+/* Animations */
+@keyframes moonSpin { 
+  to { transform: rotate(360deg); } 
+}
+
+@keyframes textFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Close button inside menu */
+.hamburger-close {
+  align-self: flex-end;
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c9a24d;
+  margin-bottom: 20px;
+}
+
+/* Nav links stacked with spacing */
+#navLinks a {
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 12px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+#navLinks a:hover {
+  background: #f0e6d2;
+}
+nav {
+  z-index: 1500;
+}
+
+header {
+  z-index: 1400;
+}
+
+.mini-cart {
+  z-index: 1200;
+}
+@media (max-width: 900px) {
+
+  .hamburger-close {
+    display: block;
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    font-size: 26px;
+    cursor: pointer;
+    color: #222;
+  }
+
+}
+.hamburger {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .hamburger {
+    display: flex;
+  }
+}
+
+.mini-cart {
+  position: fixed;     /* stay on screen while scrolling */
+  bottom: 25px;        /* distance from bottom */
+  left: 25px;          /* distance from left */
+  top: auto;           /* override previous top */
+  right: auto;         /* override previous right */
+  z-index: 1100;       /* stays above content */
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.mini-cart:hover {
+  transform: scale(1.05); /* subtle hover effect */
+}
+
+/* Optional: hide it when hamburger menu opens on mobile */
+@media (max-width: 900px) {
+  nav.show ~ .mini-cart {
+    display: none;
+  }
+}
+
+.mini-cart-dropdown {
+  display: none;       /* hidden by default */
+  position: absolute;
+  bottom: 100%;        /* start above the cart icon */
+  left: 0;             /* align left edge of dropdown with icon */
+  margin-bottom: 10px; /* space between icon and dropdown */
+  width: 320px;
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  max-height: 400px;
+  overflow-y: auto;
+  transform: translateY(10px) translateX(0);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+/* Hover Mechanism */
+.mini-cart:hover .mini-cart-dropdown {
+  transform: translateY(-10px) translateX(20px); /* diagonal slide up-right */
+  opacity: 1;
+  pointer-events: auto;
+}

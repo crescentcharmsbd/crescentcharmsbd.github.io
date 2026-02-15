@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crescent Charms BD</title>
+  <link rel="shortcut icon" href="Crescent_Charms.png" type="image/png">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div id="loader">
+  <div class="moon-loader"></div>
+  <h2 class="loader-logo">Crescent Charms</h2>
+</div>
+
+
+  <!-- Header / Navbar -->
+<header>
+  <img src="Crescent_Charms.png" alt="Logo" />
+  
+  <button id="hamburger" class="hamburger">&#9776;</button> <!-- Hamburger -->
+  
+<nav>
+  <button id="hamburgerClose" class="hamburger-close">✕</button> <!-- new close button -->
+  <a href="#home" class="nav-link">Home</a>
+  <a href="#shop" class="nav-link">Shop</a>
+  <a href="#product" class="nav-link">Product</a>
+  <a href="#cart" class="nav-link">Cart</a>
+  <a href="#track" class="nav-link">Track</a>
+  <a href="#contact" class="nav-link">Contact</a>
+</nav>
+
+</header>
+
+
+  <!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-text">
+      <h1>Crafted Under Moonlight</h1>
+      <p>Luxury, minimal, and romantic jewelry designed to elevate your everyday charm.</p>
+      <a class="btn" href="#shop">Shop Now</a>
+    </div>
+    <div class="hero-image">
+      <img src="Crescent_Charms.png" alt="Hero Image">
+    </div>
+  </section>
+
+  <!-- Products Section -->
+<section id="shop" class="products">
+    <h2>Featured Products</h2>
+    <div class="grid" id="productGrid"></div>
+  </section>
+
+  <!-- Cart Section -->
+  <section id="cart" class="cart-section">
+    <h2>Your Shopping Bag</h2>
+    <div class="cart-header">
+  <h3>Your Shopping Bag</h3>
+  <button id="clearCartBtn" class="clear-cart-btn">Clear All ✕</button>
+</div>
+
+    <div id="cartItems" class="cart-grid"></div>
+    <div class="cart-summary">
+      <div>
+        <h3 id="cartTotal">Total: ৳ 0</h3>
+        <p>Shipping calculated at checkout</p>
+      </div>
+      <button class="checkout-btn" onclick="goCheckout(this)">
+        <span class="btn-icon">🛒</span>
+        <span class="btn-text">Proceed to Checkout</span>
+      </button>
+    </div>
+    
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <p>© Crescent Charms BD · Instagram @crescentcharmsbd</p>
+  </footer>
+
+  <!-- Instagram CTA -->
+  <a class="ig" href="https://instagram.com/crescentcharms.bd" target="_blank">IG</a>
+
+  <!-- Quick View Modal -->
+  <div id="quickView" class="quick-view">
+    
+    <!-- Particles / background blur -->
+    <div class="qv-bg-particles"></div>
+
+    <!-- Popup Box -->
+    <div class="qv-box">
+      <!-- Close button -->
+      <span class="qv-close" onclick="closeQV()">×</span>
+
+      <!-- Image Gallery -->
+      <div class="qv-gallery">
+        <div class="qv-main-img-wrap">
+          <img id="qvImg" src="" alt="Product Image" class="qv-main-img">
+          <button class="qv-prev" onclick="qvPrev()">‹</button>
+          <button class="qv-next" onclick="qvNext()">›</button>
+        </div>
+        <div class="qv-thumbs" id="qvThumbs"></div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="qv-info">
+        <h3 id="qvName">Product Name</h3>
+        <p id="qvPrice">৳ 0</p>
+        <p id="qvDesc">Product description goes here. Short and sweet.</p>
+      </div>
+
+      <!-- Quantity + Add to Cart -->
+      <div class="qv-actions">
+        <div class="qv-qty-box">
+          <button onclick="changeQVQty(-1)">−</button>
+          <b id="qvQty">1</b>
+          <button onclick="changeQVQty(1)">+</button>
+        </div>
+        <button class="product-btn" id="qvAdd">
+          <span class="btn-text">Add to Cart</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+<!-- Mini Cart -->
+<div class="mini-cart" id="miniCart">
+  <div class="cart-icon-wrapper" onclick="goToCart()">
+    <span class="cart-icon">🛒 <b id="miniCartCount">0</b></span>
+  </div>
+  
+  <div class="mini-cart-dropdown">
+    <div id="miniCartItems">
+       <p style="text-align:center;color:#777;">Your bag is empty ✨</p>
+    </div>
+    <div class="mini-cart-total" id="miniCartTotal">Total: ৳ 0</div>
+    <button class="checkout-btn" style="width:100%; margin-top:10px;" onclick="goToCart()">View Full Bag</button>
+  </div>
+</div>
+
+
+  <!-- JS Scripts -->
+  <script src="script.js"></script>
+</body>
+</html>
